@@ -12,6 +12,25 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
+        $this->bootSocialiteDriver();
+        $this->bootBladeDirective();
+    }
+
+    public function register()
+    {
+        $this->registerConfiguration();
+    }
+
+    protected function registerConfiguration()
+    {
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/services.php',
+            'services'
+        );
+    }
+
+    public function bootSocialiteDriver()
+    {
         $socialite = $this->app->make(Factory::class);
         $socialite->extend(
             'sign-in-with-apple',
@@ -22,7 +41,10 @@ class ServiceProvider extends LaravelServiceProvider
                     ->buildProvider(SignInWithAppleProvider::class, $config);
             }
         );
+    }
 
+    public function bootBladeDirective()
+    {
         Blade::directive('signInWithAppleButton', function ($expression) {
             eval("\$params = [$expression];");
             list($color, $hasBorder, $type, $borderRadius) = $params;
