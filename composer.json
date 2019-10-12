@@ -1,0 +1,30 @@
+{
+    "name": "genealabs/laravel-sign-in-with-apple",
+    "description": "Add Apple's new single-signon feature to your site with ease.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mike Bronner",
+            "email": "hello@genealabs.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^6.2",
+        "laravel/socialite": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "GeneaLabs\\LaravelSignInWithApple\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "\\GeneaLabs\\LaravelSignInWithApple\\Providers\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
