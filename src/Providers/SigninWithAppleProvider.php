@@ -19,7 +19,7 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
             'https://appleid.apple.com/auth/authorize',
             $state
         );
-        // dd($url);
+
         return $url;
     }
 
