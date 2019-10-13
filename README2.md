@@ -25,9 +25,45 @@ This is an MIT-licensed open source project with its ongoing development made po
 <a name="Installation"></a>
 ## Installation
 
-```sh
-composer require genealabs/laravel-sign-in-with-apple
-```
+1. Install the composer package:
+    ```sh
+    composer require genealabs/laravel-sign-in-with-apple
+    ```
+
+2. Update the user table with the unique SIWA user identifyer:
+    ```sh
+    php artisan migrate
+    ```
+
+    To prevent automatic migrations from running (for example if you have a different migration setup, like multi-tenancy, etc.), add the following entry to your app's service provider:
+
+    ```php
+    <?php
+
+    namespace App\Providers;
+
+    use GeneaLabs\LaravelSignInWithApple\Providers\SignInWithAppleProvider;
+    use Illuminate\Support\ServiceProvider;
+
+    class AppServiceProvider extends ServiceProvider
+    {
+        public function register()
+        {
+            //
+        }
+
+        public function boot()
+        {
+            SignInWithAppleProvider::ignoreMigrations();
+        }
+    }
+    ```
+
+    And then publish the migration files and manipulate them as needed:
+
+    ```sh
+    pa vendor:publish --provider="GeneaLabs\LaravelSignInWithApple\Providers\ServiceProvider" --tag=migrations
+    ```
 
 <a name="Configuration"></a>
 ## Configuration
@@ -162,10 +198,18 @@ class AppleSigninController extends Controller
 
     public function callback(Request $request)
     {
+        // get abstract user object, not persisted
         $user = Socialite::driver("sign-in-with-apple")
             ->user();
 
-        // do what you will with the resulting user object to complete the login process, for example save the user, and log the user in.
+        // or, if you don't need to do anything out of the ordinary:
+
+        // resolve the user, save with details, log them in, and return
+        // the user object, along with data points returned from SIWA,
+        // which aren't persisted. The user will, of course, be available
+        // via `auth()->user()` as well.
+        $user = Socialite::driver("sign-in-with-apple")
+            ->login();
     }
 }
 ```

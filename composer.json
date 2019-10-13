@@ -10,6 +10,7 @@
         }
     ],
     "require": {
+        "illuminate/database": "^6.2",
         "illuminate/support": "^6.2",
         "laravel/socialite": "^4.2"
     },
