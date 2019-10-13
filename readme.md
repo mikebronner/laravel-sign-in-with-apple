@@ -6,6 +6,15 @@
 
 This is an MIT-licensed open source project with its ongoing development made possible by the support of the community. If you'd like to support this, and our other packages, please consider sponsoring us via the button above.
 
+## Table of Contents
+- [Requirements](#Requirements)
+- [Installation](#Installation)
+- [Configuration](#Configuration)
+- [Implementation](#Implementation)
+  - Login [Button](#Button)
+  - [Controller](#Controller)
+
+<a name="Requirements"></a>
 ## Requirements
 
 - PHP 7.2+
@@ -13,12 +22,14 @@ This is an MIT-licensed open source project with its ongoing development made po
 - Socialite 4.2+
 - Apple Developer Subscription
 
+<a name="Installation"></a>
 ## Installation
 
 ```sh
 composer require genealabs/laravel-sign-in-with-apple
 ```
 
+<a name="Configuration"></a>
 ## Configuration
 
 1. Create an `App ID` for your website (https://developer.apple.com/account/resources/identifiers/list/bundleId) with the following details:
@@ -103,8 +114,10 @@ composer require genealabs/laravel-sign-in-with-apple
     SIGN_IN_WITH_APPLE_CLIENT_SECRET="your app's client secret as calculated in step 4"
     ```
 
+<a name="Implementation"></a>
 ## Implementation
 
+<a name="Login Button"></a>
 ### Login Button
 
 Add the following blade directive to your login page:
@@ -120,6 +133,7 @@ Add the following blade directive to your login page:
 | $type      | String, either `"sign-in"` or `"continue"`. |
 | $borderRadius | Integer, greater or equal to 0. |
 
+<a name="Controller"></a>
 ### Controller
 This implementation uses Socialite to get the login credentials. The following is an example implementation of the controller:
 
