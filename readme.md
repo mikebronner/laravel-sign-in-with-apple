@@ -13,14 +13,6 @@ This is an MIT-licensed open source project with its ongoing development made po
 - Socialite 4.2+
 - Apple Developer Subscription
 
-## Outstanding Issues
-The following are issues that still need to be resolved with the service. These are likely at least in part something Apple needs to address:
-
-- user's `name` property is not being returned by Apple (the email address is).
-- user is prompted at each login for details.
-
-The implementation seems not to finalized by Apple yet, as things are in flux from day-to-day. **Please consider this package to be in an experimental stage at this point.**
-
 ## Installation
 
 ```sh

@@ -15,12 +15,10 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     protected function getAuthUrl($state)
     {
-        $url = $this->buildAuthUrlFromBase(
+        return $this->buildAuthUrlFromBase(
             'https://appleid.apple.com/auth/authorize',
             $state
         );
-
-        return $url;
     }
 
     protected function getCodeFields($state = null)
@@ -101,10 +99,19 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     protected function mapUserToObject(array $user)
     {
+        if (request()->filled("user")) {
+            $user["name"] = json_decode(request("user"), true)["name"];
+            $fullName = trim(
+                ($user["name"]['firstName'] ?? "")
+                . " "
+                . ($user["name"]['lastName']) ?? ""
+            );
+        }
+
         return (new User)
             ->setRaw($user)
             ->map([
-                'name' => $user['name'] ?? null,
+                'name' => $fullName ?? null,
                 'email' => $user['email'] ?? null,
             ]);
     }
