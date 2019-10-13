@@ -19,7 +19,7 @@ The following are issues that still need to be resolved with the service. These 
 - user's `name` property is not being returned by Apple (the email address is).
 - user is prompted at each login for details.
 
-The implementation seems to no be quite finalized by Apple yet, as things are in flux from day-to-day. **Please consider this package to be in an experimental stage at this point.**
+The implementation seems not to finalized by Apple yet, as things are in flux from day-to-day. **Please consider this package to be in an experimental stage at this point.**
 
 ## Installation
 
