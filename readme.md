@@ -11,7 +11,7 @@ This is an MIT-licensed open source project with its ongoing development made po
 - [Installation](#Installation)
 - [Configuration](#Configuration)
 - [Implementation](#Implementation)
-  - [Login Button](#LoginButton)
+  - [Button](#Button)
   - [Controller](#Controller)
 
 <a name="Requirements"></a>
@@ -118,7 +118,7 @@ composer require genealabs/laravel-sign-in-with-apple
 ## Implementation
 
 <a name="LoginButton"></a>
-### Login Button
+### Button
 
 Add the following blade directive to your login page:
 
