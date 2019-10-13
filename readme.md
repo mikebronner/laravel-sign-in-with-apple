@@ -11,7 +11,7 @@ This is an MIT-licensed open source project with its ongoing development made po
 - [Installation](#Installation)
 - [Configuration](#Configuration)
 - [Implementation](#Implementation)
-  - Login [Button](#Button)
+  - [Login Button](#LoginButton)
   - [Controller](#Controller)
 
 <a name="Requirements"></a>
@@ -117,13 +117,13 @@ composer require genealabs/laravel-sign-in-with-apple
 <a name="Implementation"></a>
 ## Implementation
 
-<a name="Login Button"></a>
+<a name="LoginButton"></a>
 ### Login Button
 
 Add the following blade directive to your login page:
 
 ```php
-@signInWithAppleButton($color, $hasBorder, $type, $borderRadius)
+@signInWithApple($color, $hasBorder, $type, $borderRadius)
 ```
 
 | Parameter | Definition |
