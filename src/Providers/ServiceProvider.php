@@ -45,7 +45,7 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function bootBladeDirective()
     {
-        Blade::directive('signInWithAppleButton', function ($expression) {
+        Blade::directive('signInWithApple', function ($expression) {
             eval("\$params = [$expression];");
             list($color, $hasBorder, $type, $borderRadius) = $params;
 
