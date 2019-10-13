@@ -169,6 +169,7 @@ class AppleSigninController extends Controller
 }
 ```
 
+Note that when processing the returned `$user` object, it is critical to know that the `sub` element is the unique identifier for the user, **NOT** the email address. For more details, visit https://developer.apple.com/documentation/signinwithapplerestapi/authenticating_users_with_sign_in_with_apple.
 ----------
 
 #### Credits
