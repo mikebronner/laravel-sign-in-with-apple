@@ -187,6 +187,7 @@ This implementation uses Socialite to get the login credentials. The following i
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use GeneaLabs\LaravelSocialiter\Facades\Socialiter;
 use Laravel\Socialite\Facades\Socialite;
 
 class AppleSigninController extends Controller
@@ -208,14 +209,9 @@ class AppleSigninController extends Controller
         // get abstract user object, not persisted
         $user = Socialite::driver("sign-in-with-apple")
             ->user();
-
-        // or, if you don't need to do anything out of the ordinary:
-
-        // resolve the user, save with details, log them in, and return
-        // the user object, along with data points returned from SIWA,
-        // which aren't persisted. The user will, of course, be available
-        // via `auth()->user()` as well.
-        $user = Socialite::driver("sign-in-with-apple")
+        
+        // or use Socialiter to automatically manage user resolution and persistance
+        $user = Socialiter::driver("sign-in-with-apple")
             ->login();
     }
 }
