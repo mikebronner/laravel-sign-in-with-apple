@@ -25,6 +25,8 @@ This is an MIT-licensed open source project with its ongoing development made po
 <a name="Installation"></a>
 ## Installation
 
+<a href="https://vimeo.com/366353988"><img src="https://user-images.githubusercontent.com/1791050/36356190-fc1982b2-14a2-11e8-85ed-06f8e3b57ae8.png" alt="installation guide cover" /></a>
+
 1. Install the composer package:
     ```sh
     composer require genealabs/laravel-sign-in-with-apple
