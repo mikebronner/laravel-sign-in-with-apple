@@ -30,6 +30,13 @@ This is an MIT-licensed open source project with its ongoing development made po
     composer require genealabs/laravel-sign-in-with-apple
     ```
 
+    We also recommend using [geneaLabs/laravel-socialiter](https://github.com/GeneaLabs/laravel-socialiter)
+    to automatically manage user resolution and persistance:
+
+    ```sh
+    composer require genealabs/laravel-socialiter
+    ```
+
 2. Update the user table with the unique SIWA user identifyer:
     ```sh
     php artisan migrate

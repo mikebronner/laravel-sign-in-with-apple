@@ -6,13 +6,22 @@
     "authors": [
         {
             "name": "Mike Bronner",
-            "email": "hello@genealabs.com"
+            "email": "hello@genealabs.com",
+            "homepage": "https://genealabs.com",
+            "role": "Developer"
         }
     ],
+    "readme": "README.md",
+    "suggest": {
+        "genealabs/laravel-socialiter": "Automatic user resolution and persistence for any Laravel Socialite driver."
+    },
     "require": {
-        "illuminate/database": "^6.2",
         "illuminate/support": "^6.2",
         "laravel/socialite": "^4.2"
+    },
+    "require-dev": {
+        "phpmd/phpmd": "^2.7",
+        "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
         "psr-4": {

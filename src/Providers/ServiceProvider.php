@@ -12,17 +12,6 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
-        if (SignInWithAppleProvider::$runsMigrations) {
-            $this->loadMigrationsFrom(__DIR__ . "/../../database/migrations");
-        }
-
-        $this->publishes(
-            [
-                __DIR__ . '/../../database/migrations/' => database_path('migrations')
-            ],
-            'migrations'
-        );
-
         $this->bootSocialiteDriver();
         $this->bootBladeDirective();
     }
