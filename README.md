@@ -75,7 +75,7 @@ This is an MIT-licensed open source project with its ongoing development made po
         sudo gem install jwt
         ```
     
-    - Create a temporary file to process the private key:
+    - Create a file called `client_secret.rb` to process the private key:
         ```ruby
         require 'jwt'
 
@@ -113,6 +113,10 @@ This is an MIT-licensed open source project with its ongoing development made po
     - Save the file and run it from the terminal. It will spit out a JWT which is
         your client secret, which you will need to add to your `.env` file in the
         next step.
+        ```sh
+        ruby client_secret.rb
+        ```
+        
 5. Set the necessary environment variables in your `.env` file:
 
     ```env
