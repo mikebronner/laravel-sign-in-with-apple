@@ -37,41 +37,6 @@ This is an MIT-licensed open source project with its ongoing development made po
     composer require genealabs/laravel-socialiter
     ```
 
-2. Update the user table with the unique SIWA user identifyer:
-    ```sh
-    php artisan migrate
-    ```
-
-    To prevent automatic migrations from running (for example if you have a different migration setup, like multi-tenancy, etc.), add the following entry to your app's service provider:
-
-    ```php
-    <?php
-
-    namespace App\Providers;
-
-    use GeneaLabs\LaravelSignInWithApple\Providers\SignInWithAppleProvider;
-    use Illuminate\Support\ServiceProvider;
-
-    class AppServiceProvider extends ServiceProvider
-    {
-        public function register()
-        {
-            //
-        }
-
-        public function boot()
-        {
-            SignInWithAppleProvider::ignoreMigrations();
-        }
-    }
-    ```
-
-    And then publish the migration files and manipulate them as needed:
-
-    ```sh
-    pa vendor:publish --provider="GeneaLabs\LaravelSignInWithApple\Providers\ServiceProvider" --tag=migrations
-    ```
-
 <a name="Configuration"></a>
 ## Configuration
 
