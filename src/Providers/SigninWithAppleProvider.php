@@ -15,14 +15,10 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     protected function getAuthUrl($state)
     {
-        $url = $this->buildAuthUrlFromBase(
+        return $this->buildAuthUrlFromBase(
             'https://appleid.apple.com/auth/authorize',
             $state
         );
-
-        // ddd($url);
-
-        return $url;
     }
 
     protected function getCodeFields($state = null)
