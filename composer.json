@@ -16,16 +16,17 @@
         "genealabs/laravel-socialiter": "Automatic user resolution and persistence for any Laravel Socialite driver."
     },
     "require": {
-        "illuminate/support": "^6.2",
-        "laravel/socialite": "^4.2",
-        "php": "^7.2"
+        "illuminate/support": "^7.0",
+        "laravel/socialite": "dev-master@dev"
     },
     "require-dev": {
-        "orchestra/testbench-dusk": "^4.2",
-        "orchestra/testbench": "^4.2",
+        "orchestra/testbench-browser-kit": "^5.0",
+        "orchestra/testbench-dusk": "^5.0",
+        "orchestra/testbench": "^5.0",
         "phpmd/phpmd": "^2.7",
         "squizlabs/php_codesniffer": "^3.5",
-        "orchestra/testbench-browser-kit": "^4.2"
+        "predis/predis": "^1.1",
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {

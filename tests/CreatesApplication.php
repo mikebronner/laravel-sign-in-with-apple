@@ -22,6 +22,7 @@ trait CreatesApplication
 
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('database.redis.client', "predis");
         $app->make(Kernel::class)
             ->pushMiddleware(StartSession::class);
 
