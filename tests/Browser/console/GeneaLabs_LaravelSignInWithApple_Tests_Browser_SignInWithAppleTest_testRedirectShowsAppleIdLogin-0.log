@@ -1,0 +1,8 @@
+[
+    {
+        "level": "WARNING",
+        "message": "https:\/\/appleid.cdn-apple.com\/appleauth\/static\/jsj\/2086116106\/profile\/app.js 254 Mixed Content: The page at 'https:\/\/appleid.apple.com\/auth\/authorize?client_id=dev.test.service-id&redirect_uri=http%3A%2F%2Ftesting.dev%2Fsiwa-callback&scope=name%20email&response_type=code&response_mode=form_post&state=DCCb1UiYHkFyhepDPSMCvHorrEQPIfQL4vD7dMZl' was loaded over a secure connection, but contains a form that targets an insecure endpoint 'http:\/\/testing.dev\/siwa-callback'. This endpoint should be made available over a secure connection.",
+        "source": "security",
+        "timestamp": 1583082984883
+    }
+]

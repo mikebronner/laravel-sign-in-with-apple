@@ -16,7 +16,7 @@
         "genealabs/laravel-socialiter": "Automatic user resolution and persistence for any Laravel Socialite driver."
     },
     "require": {
-        "illuminate/support": "^7.0",
+        "illuminate/support": "^6.0|^7.0",
         "laravel/socialite": "dev-master@dev"
     },
     "require-dev": {
