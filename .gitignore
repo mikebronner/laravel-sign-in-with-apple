@@ -3,3 +3,4 @@
 composer.lock
 phpmd.xml
 phpunit.xml
+/tests/Browser/screenshots
