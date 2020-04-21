@@ -33,7 +33,7 @@ This is an MIT-licensed open source project with its ongoing development made po
     ```
 
     We also recommend using [geneaLabs/laravel-socialiter](https://github.com/GeneaLabs/laravel-socialiter)
-    to automatically manage user resolution and persistance:
+    to automatically manage user resolution and persistence:
 
     ```sh
     composer require genealabs/laravel-socialiter
@@ -181,7 +181,7 @@ class AppleSigninController extends Controller
         $user = Socialite::driver("sign-in-with-apple")
             ->user();
         
-        // or use Socialiter to automatically manage user resolution and persistance
+        // or use Socialiter to automatically manage user resolution and persistence
         $user = Socialiter::driver("sign-in-with-apple")
             ->login();
     }
