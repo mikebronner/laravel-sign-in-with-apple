@@ -92,7 +92,7 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
         ));
 
         return $user
-            ->setToken(Arr::get($response, 'access_token'))
+            ->setToken(Arr::get($response, 'id_token'))
             ->setRefreshToken(Arr::get($response, 'refresh_token'))
             ->setExpiresIn(Arr::get($response, 'expires_in'));
     }
