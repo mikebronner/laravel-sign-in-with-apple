@@ -2,11 +2,12 @@
 
 namespace GeneaLabs\LaravelSignInWithApple\Tests;
 
-use GeneaLabs\LaravelSignInWithApple\Providers\ServiceProvider;
-use GeneaLabs\LaravelSignInWithApple\Tests\Fixtures\Providers\TestingServiceProvider;
 use Illuminate\Contracts\Http\Kernel;
+use Orchestra\Testbench\Dusk\Options;
 use Illuminate\Session\Middleware\StartSession;
 use Laravel\Socialite\SocialiteServiceProvider;
+use GeneaLabs\LaravelSignInWithApple\Providers\ServiceProvider;
+use GeneaLabs\LaravelSignInWithApple\Tests\Fixtures\Providers\TestingServiceProvider;
 
 trait CreatesApplication
 {
@@ -14,7 +15,7 @@ trait CreatesApplication
     {
         parent::setUp();
 
-        \Orchestra\Testbench\Dusk\Options::withUI();
+        Options::withUI();
         $this->artisan("view:clear");
         $this->artisan("cache:clear");
         $this->artisan("config:clear");
