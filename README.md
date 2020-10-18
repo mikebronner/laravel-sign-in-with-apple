@@ -17,8 +17,8 @@ This is an MIT-licensed open source project with its ongoing development made po
 <a name="Requirements"></a>
 ## Requirements
 
-- PHP 7.2+
-- Laravel 7+
+- PHP 7.3+
+- Laravel 8+
 - Socialite 4.2+
 - Apple Developer Subscription
 
