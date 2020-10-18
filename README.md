@@ -18,8 +18,8 @@ This is an MIT-licensed open source project with its ongoing development made po
 ## Requirements
 
 - PHP 7.3+
-- Laravel 8+
-- Socialite 4.2+
+- Laravel 8.0+
+- Socialite 5.0+
 - Apple Developer Subscription
 
 <a name="Installation"></a>
