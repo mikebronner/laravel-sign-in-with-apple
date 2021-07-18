@@ -72,7 +72,7 @@ class ServiceProvider extends LaravelServiceProvider
 </style>
 <a
     href="{$route}"
-    style="display: block; font-family='SF Pro Text'; text-align: center; height: 25%; padding: 5%; padding-top: 3%; padding-bottom: 3%; width: 100%; background-color: {$backgroundColor}; border: {$border}; border-radius: {$borderRadius}px; color: {$textColor};"
+    style="display: block; font-family:'SF Pro Text'; text-align: center; height: 25%; padding: 5%; padding-top: 3%; padding-bottom: 3%; width: 100%; background-color: {$backgroundColor}; border: {$border}; border-radius: {$borderRadius}px; color: {$textColor};"
     id="sign-in-with-apple"
 >
      {$text} with Apple
