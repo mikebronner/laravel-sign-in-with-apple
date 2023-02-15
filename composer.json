@@ -1,5 +1,5 @@
 {
-    "name": "genealabs/laravel-sign-in-with-apple",
+    "name": "ambieco/laravel-sign-in-with-apple",
     "description": "Add Apple's new single-signon feature to your site with ease.",
     "type": "library",
     "license": "MIT",
