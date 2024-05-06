@@ -4,3 +4,11 @@ composer.lock
 phpmd.xml
 phpunit.xml
 /tests/Browser/screenshots
+.idea/laravel-sign-in-with-apple.iml
+.idea/modules.xml
+.idea/php.xml
+.idea/workspace.xml
+.idea/blade.xml
+.idea/laravel-idea-personal.xml
+.idea/laravel-idea.xml
+.idea/vcs.xml

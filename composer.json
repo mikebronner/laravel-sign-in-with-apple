@@ -17,15 +17,15 @@
     },
     "require": {
         "php": ">=7.3",
-        "illuminate/support": "^10.0",
+        "illuminate/support": "^10.0|^11.0",
         "laravel/socialite": "^5.3"
     },
     "require-dev": {
-        "orchestra/testbench-browser-kit": "^8.0",
-        "orchestra/testbench-dusk": "^8.0",
-        "orchestra/testbench": "^8.0",
+        "orchestra/testbench-browser-kit": "^7.12|^8.5",
+        "orchestra/testbench-dusk": "^7.20|^8.22",
+        "orchestra/testbench": "^8.0|^9.0",
         "predis/predis": "^1.1",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^9.5.10|^10.5"
     },
     "autoload": {
         "psr-4": {
