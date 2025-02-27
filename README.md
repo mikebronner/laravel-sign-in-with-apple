@@ -33,7 +33,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
 
 1. Install the composer package:
     ```sh
-    composer require genealabs/laravel-sign-in-with-apple
+    composer require mikebronner/laravel-sign-in-with-apple
     ```
 
     We also recommend using [geneaLabs/laravel-socialiter](https://github.com/GeneaLabs/laravel-socialiter)
@@ -66,7 +66,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
             upload it to https://example.com/.well-known/apple-developer-domain-association.txt, and then click the "Verify"
             button.
 3. Create a `Private Key` for your website (https://developer.apple.com/account/resources/authkeys/list) with the following details:
-    - Key Name: 
+    - Key Name:
     - Check "Sign In With Apple"
     - Configure "Sign In With Apple":
         - Primary App ID: (select the primary app id created in step 1)
@@ -80,7 +80,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
         ```sh
         sudo gem install jwt
         ```
-    
+
     - Create a file called `client_secret.rb` to process the private key:
         ```ruby
         require 'jwt'
@@ -122,7 +122,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
         ```sh
         ruby client_secret.rb
         ```
-        
+
 5. Set the necessary environment variables in your `.env` file:
 
     ```env
@@ -184,7 +184,7 @@ class AppleSigninController extends Controller
         // get abstract user object, not persisted
         $user = Socialite::driver("sign-in-with-apple")
             ->user();
-        
+
         // or use Socialiter to automatically manage user resolution and persistence
         $user = Socialiter::driver("sign-in-with-apple")
             ->login();
