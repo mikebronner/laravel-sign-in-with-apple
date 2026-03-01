@@ -21,10 +21,19 @@ We thank the following sponsors for their generosity, please take a moment to ch
 <a name="Requirements"></a>
 ## Requirements
 
-- PHP 7.3+
-- Laravel 8.0+
+- PHP 8.2+
+- Laravel 10.0+
 - Socialite 5.0+
 - Apple Developer Subscription
+
+### Version Support
+
+| Laravel | PHP       | Package |
+|---------|-----------|----------|
+| 10.x    | 8.2+      | 5.x     |
+| 11.x    | 8.2+      | 5.x     |
+| 12.x    | 8.2+      | 5.x     |
+| 13.x    | 8.3+      | 5.x     |
 
 <a name="Installation"></a>
 ## Installation
