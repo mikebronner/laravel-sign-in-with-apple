@@ -99,16 +99,18 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     protected function mapUserToObject(array $user)
     {
+        $firstName = null;
+        $lastName = null;
+        $fullName = null;
+
         if (request()->filled("user")) {
             $userRequest = json_decode(request("user"), true);
 
-            if (array_key_exists("name", $userRequest)) {
+            if (is_array($userRequest) && array_key_exists("name", $userRequest)) {
                 $user["name"] = $userRequest["name"];
-                $fullName = trim(
-                    ($user["name"]['firstName'] ?? "")
-                    . " "
-                    . ($user["name"]['lastName'] ?? "")
-                );
+                $firstName = $user["name"]['firstName'] ?? null;
+                $lastName = $user["name"]['lastName'] ?? null;
+                $fullName = trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: null;
             }
         }
 
@@ -116,7 +118,9 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
             ->setRaw($user)
             ->map([
                 "id" => $user["sub"],
-                "name" => $fullName ?? null,
+                "name" => $fullName,
+                "first_name" => $firstName,
+                "last_name" => $lastName,
                 "email" => $user["email"] ?? null,
             ]);
     }
