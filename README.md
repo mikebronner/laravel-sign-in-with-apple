@@ -214,6 +214,30 @@ be. My checklist for package development includes:
     at <http://keepachangelog.com>.
 -   ✅ Have no PHPMD or PHPCS warnings throughout all code.
 
+## Troubleshooting
+
+### `invalid_client` Error
+This means Apple rejected your credentials. Common causes:
+- **Wrong Client ID**: `SIGN_IN_WITH_APPLE_CLIENT_ID` must be your **Services ID** (not your App ID or Team ID).
+- **Wrong Client Secret**: The JWT must be signed with the correct private key, team ID, and key ID.
+- **Key revoked**: Check that your key is still active in your Apple Developer account under Keys.
+
+### `invalid_grant` Error
+This means the authorization code was rejected. Common causes:
+- **Code already used**: Apple authorization codes are single-use. If you refresh the callback page, the code will be invalid.
+- **Code expired**: Codes are valid for a short time (approximately 5 minutes).
+- **Redirect URI mismatch**: The `SIGN_IN_WITH_APPLE_REDIRECT` must exactly match the URL registered in your Apple Developer account.
+- **Client secret expired**: Apple client secret JWTs are valid for up to 6 months. Regenerate if expired.
+
+### Missing Configuration
+If you see `Sign In With Apple is missing required config`, ensure you have set the following in your `.env`:
+```
+SIGN_IN_WITH_APPLE_CLIENT_ID=your-services-id
+SIGN_IN_WITH_APPLE_CLIENT_SECRET=your-generated-jwt
+SIGN_IN_WITH_APPLE_REDIRECT=https://your-app.com/callback
+SIGN_IN_WITH_APPLE_LOGIN=/login/apple
+```
+
 ## Contributing
 Please observe and respect all aspects of the included [Code of Conduct](https://github.com/GeneaLabs/laravel-sign-in-with-apple/blob/master/CODE_OF_CONDUCT.md).
 

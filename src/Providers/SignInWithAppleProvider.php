@@ -2,6 +2,8 @@
 
 namespace GeneaLabs\LaravelSignInWithApple\Providers;
 
+use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidAppleCredentialsException;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Arr;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -12,6 +14,18 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 {
     protected $encodingType = PHP_QUERY_RFC3986;
     protected $scopeSeparator = " ";
+
+    /**
+     * Error descriptions for Apple token endpoint errors.
+     */
+    protected static array $errorDescriptions = [
+        'invalid_client' => 'The client_id or client_secret is incorrect. '
+            . 'Verify your APPLE_CLIENT_ID matches your Apple Services ID '
+            . 'and your APPLE_CLIENT_SECRET (JWT) is correctly generated with the right team_id and key_id.',
+        'invalid_grant' => 'The authorization code is invalid, expired, or has already been used. '
+            . 'This can also occur if the redirect_uri does not match the one registered with Apple, '
+            . 'or if the client_secret JWT has expired (they are valid for up to 6 months).',
+    ];
 
     protected function getAuthUrl($state)
     {
@@ -41,6 +55,20 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
     protected function getTokenUrl()
     {
         return "https://appleid.apple.com/auth/token";
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Wraps Apple token endpoint errors with descriptive messages.
+     */
+    public function getAccessTokenResponse($code)
+    {
+        try {
+            return parent::getAccessTokenResponse($code);
+        } catch (ClientException $e) {
+            $this->handleTokenError($e);
+        }
     }
 
     public function getAccessToken($code)
@@ -119,5 +147,33 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
                 "name" => $fullName ?? null,
                 "email" => $user["email"] ?? null,
             ]);
+    }
+
+    /**
+     * Handle a ClientException from the Apple token endpoint.
+     *
+     * Parses the JSON error response and throws a descriptive exception.
+     *
+     * @throws InvalidAppleCredentialsException
+     */
+    protected function handleTokenError(ClientException $exception): never
+    {
+        $body = (string) $exception->getResponse()->getBody();
+        $data = json_decode($body, true) ?? [];
+        $error = $data['error'] ?? 'unknown_error';
+
+        $description = static::$errorDescriptions[$error]
+            ?? "Apple returned error: {$error}. Check your Sign In With Apple configuration.";
+
+        throw new InvalidAppleCredentialsException(
+            "Sign In With Apple token error [{$error}]: {$description}",
+            [
+                'apple_error' => $error,
+                'client_id' => $this->clientId,
+                'redirect_url' => $this->redirectUrl,
+            ],
+            $exception->getCode(),
+            $exception,
+        );
     }
 }
