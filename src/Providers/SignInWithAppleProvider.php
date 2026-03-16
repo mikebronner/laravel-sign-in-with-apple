@@ -4,6 +4,7 @@ namespace GeneaLabs\LaravelSignInWithApple\Providers;
 
 use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidAppleCredentialsException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Arr;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -68,6 +69,8 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
             return parent::getAccessTokenResponse($code);
         } catch (ClientException $e) {
             $this->handleTokenError($e);
+        } catch (ServerException $e) {
+            $this->handleServerError($e);
         }
     }
 
@@ -156,6 +159,28 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
      *
      * @throws InvalidAppleCredentialsException
      */
+    /**
+     * Handle a ServerException (5xx) from the Apple token endpoint.
+     *
+     * Apple's servers occasionally return 500 errors. This wraps them
+     * in a descriptive exception so apps can handle them gracefully.
+     *
+     * @throws \RuntimeException
+     */
+    protected function handleServerError(ServerException $exception): never
+    {
+        $statusCode = $exception->getResponse()->getStatusCode();
+
+        throw new \RuntimeException(
+            "Apple Sign In is temporarily unavailable (HTTP {$statusCode}). "
+            . 'Apple\'s authentication servers returned a server error. '
+            . 'This is typically a temporary issue on Apple\'s side. '
+            . 'Please try again in a few minutes.',
+            $statusCode,
+            $exception,
+        );
+    }
+
     protected function handleTokenError(ClientException $exception): never
     {
         $body = (string) $exception->getResponse()->getBody();
