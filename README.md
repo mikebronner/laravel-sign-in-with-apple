@@ -135,12 +135,14 @@ We thank the following sponsors for their generosity, please take a moment to ch
 5. Set the necessary environment variables in your `.env` file:
 
     ```env
-    SIGN_IN_WITH_APPLE_LOGIN="/apple/login/controller/login/action"
     SIGN_IN_WITH_APPLE_REDIRECT="/apple/login/controller/callback/action"
     SIGN_IN_WITH_APPLE_CLIENT_ID="your app's service id as registered with Apple"
     SIGN_IN_WITH_APPLE_CLIENT_SECRET="your app's client secret as calculated in step 4"
     ```
 
+    > **Note:** The `SIGN_IN_WITH_APPLE_LOGIN` environment variable has been removed.
+    > Login routes should be defined in your application's route files instead.
+    > See the [Migration Guide](#MigrationGuide) below if upgrading from an older version.
 
 ### Redirect URL Requirements
 
@@ -221,6 +223,7 @@ class AppleSigninController extends Controller
 Note that when processing the returned `$user` object, it is critical to know that the `sub` element is the unique identifier for the user, **NOT** the email address. For more details, visit https://developer.apple.com/documentation/signinwithapplerestapi/authenticating_users_with_sign_in_with_apple.
 
 
+
 ### Missing Authorization Code
 
 If you receive an error about a missing authorization code in the callback, check:
@@ -230,6 +233,26 @@ If you receive an error about a missing authorization code in the callback, chec
 2. **CSRF protection must be disabled for the callback** — Since Apple's POST doesn't include a CSRF token, Laravel will return a 419 error and the code will never reach your controller. See the [CSRF Exclusion](#CsrfExclusion) section above.
 
 3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
+
+<a name="MigrationGuide"></a>
+## Migration Guide
+
+### Upgrading from versions prior to the config update
+
+The configuration has been simplified. The following changes were made:
+
+| Old Key | New Behavior |
+|---------|-------------|
+| `SIGN_IN_WITH_APPLE_LOGIN` | **Removed.** Define your login route in your application's route files instead of the config. |
+| `SIGN_IN_WITH_APPLE_REDIRECT` | Unchanged — still used for the OAuth callback URL. |
+| `SIGN_IN_WITH_APPLE_CLIENT_ID` | Unchanged. |
+| `SIGN_IN_WITH_APPLE_CLIENT_SECRET` | Unchanged. |
+
+**Steps to upgrade:**
+
+1. Remove `SIGN_IN_WITH_APPLE_LOGIN` from your `.env` file.
+2. If you relied on the `login` config key for the `@signInWithApple` Blade directive button URL, define the route in your application's routes file and update the directive or link accordingly.
+3. The package will emit a `E_USER_DEPRECATED` notice if the old `login` key is still present, giving you time to migrate before it is fully removed.
 
 ----------
 
