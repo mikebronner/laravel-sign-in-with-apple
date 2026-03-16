@@ -257,6 +257,63 @@ If you receive an error about a missing authorization code in the callback, chec
 
 3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
 
+### Handling Revoked Access
+
+When a user revokes your app's access via Apple ID settings, Apple sends a server-to-server notification. This package provides an `AppleNotificationController` and `AppleAccessRevoked` event to handle this.
+
+**1. Register the notification route:**
+
+```php
+use GeneaLabs\LaravelSignInWithApple\Http\Controllers\AppleNotificationController;
+
+Route::post('/apple/notifications', [AppleNotificationController::class, 'handle'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+```
+
+**2. Listen for the revocation event:**
+
+```php
+// In EventServiceProvider or a listener
+use GeneaLabs\LaravelSignInWithApple\Events\AppleAccessRevoked;
+
+Event::listen(AppleAccessRevoked::class, function (AppleAccessRevoked $event) {
+    // $event->sub — the Apple user ID
+    // $event->eventType — 'consent-revoked' or 'account-delete'
+    
+    $user = User::where('apple_id', $event->sub)->first();
+    if ($user) {
+        // Deactivate, log out, or clean up
+    }
+});
+```
+
+**3. Configure the endpoint in Apple Developer:**
+
+Add your notification URL (`https://example.com/apple/notifications`) in the Apple Developer portal under your Services ID configuration.
+
+**Important:** Apple only provides the user's name and email on the **first** authorization. If a user revokes access and re-authenticates, Apple treats it as a new sign-in but may not provide the name again. Always store the user's name on first sign-in.
+
+**Handling re-authentication after revocation:**
+
+When a user revokes and re-authenticates, Apple may assign a new `sub` value. The Socialite user object includes an `is_returning_user` flag to help you detect this:
+
+```php
+$appleUser = Socialite::driver('sign-in-with-apple')->user();
+
+if ($appleUser['is_returning_user']) {
+    // User re-authenticated after revocation — match by email
+    $user = User::where('email', $appleUser->getEmail())->first();
+} else {
+    // First-time sign-in — name is available
+    $user = User::firstOrCreate(
+        ['apple_id' => $appleUser->getId()],
+        ['name' => $appleUser->getName(), 'email' => $appleUser->getEmail()]
+    );
+}
+```
+
+**Security:** The notification endpoint verifies Apple's JWT signatures against Apple's public keys (fetched from `https://appleid.apple.com/auth/keys`). Keys are cached for 1 hour. Unsigned or forged notifications are rejected.
+
 <a name="MigrationGuide"></a>
 ## Migration Guide
 
