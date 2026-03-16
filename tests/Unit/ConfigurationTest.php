@@ -10,7 +10,7 @@ class ConfigurationTest extends UnitTestCase
     {
         // The updated config only requires client_id, client_secret, and redirect.
         // If we got this far without exceptions, the package bootstrapped correctly.
-        $config = config('services.sign_in_with_apple');
+        $config = config('services.apple');
 
         $this->assertIsArray($config);
         $this->assertArrayHasKey('client_id', $config);
@@ -25,37 +25,43 @@ class ConfigurationTest extends UnitTestCase
 
         $this->assertArrayNotHasKey(
             'login',
-            $defaultConfig['sign_in_with_apple'],
+            $defaultConfig['apple'],
             'The login key should not be in the default config file.'
         );
     }
 
     public function testExistingValidConfigStillWorks(): void
     {
-        // Simulate a user who still has the old config keys set via env.
-        // The package should still work — the old keys don't break anything.
         config([
-            'services.sign_in_with_apple.login' => '/old-login-route',
-            'services.sign_in_with_apple.redirect' => 'http://testing.dev/callback',
-            'services.sign_in_with_apple.client_id' => 'test-client-id',
-            'services.sign_in_with_apple.client_secret' => 'test-client-secret',
+            'services.apple.redirect' => 'http://testing.dev/callback',
+            'services.apple.client_id' => 'test-client-id',
+            'services.apple.client_secret' => 'test-client-secret',
         ]);
 
-        $config = config('services.sign_in_with_apple');
+        $config = config('services.apple');
 
-        $this->assertEquals('/old-login-route', $config['login']);
         $this->assertEquals('http://testing.dev/callback', $config['redirect']);
         $this->assertEquals('test-client-id', $config['client_id']);
         $this->assertEquals('test-client-secret', $config['client_secret']);
     }
 
-    public function testDeprecatedLoginKeyTriggersDeprecationNotice(): void
+    public function testDeprecatedConfigKeyTriggersDeprecationNotice(): void
     {
-        config(['services.sign_in_with_apple.login' => '/old-login-route']);
+        // Simulate a user who still has the old `services.sign_in_with_apple` key
+        // but no `services.apple` key.
+        config([
+            'services.sign_in_with_apple' => [
+                'client_id' => 'old-id',
+                'client_secret' => 'old-secret',
+                'redirect' => '/old-callback',
+            ],
+        ]);
+        config(['services.apple' => null]);
+        $this->app['config']->offsetUnset('services.apple');
 
         $deprecationTriggered = false;
         set_error_handler(function ($errno, $errstr) use (&$deprecationTriggered) {
-            if ($errno === E_USER_DEPRECATED && str_contains($errstr, 'login')) {
+            if ($errno === E_USER_DEPRECATED && str_contains($errstr, 'sign_in_with_apple')) {
                 $deprecationTriggered = true;
             }
             return true;
@@ -68,13 +74,27 @@ class ConfigurationTest extends UnitTestCase
 
         $this->assertTrue(
             $deprecationTriggered,
-            'A deprecation notice should be triggered when the login key is present.'
+            'A deprecation notice should be triggered when the old config key is used.'
         );
+
+        // Verify the old values were migrated to the new key
+        $this->assertEquals('old-id', config('services.apple.client_id'));
     }
 
-    public function testNoDeprecationWhenLoginKeyAbsent(): void
+    public function testNoDeprecationWhenNewConfigKeyExists(): void
     {
-        config(['services.sign_in_with_apple.login' => null]);
+        // When `services.apple` is already set, no deprecation should fire
+        // even if the old key also exists.
+        config([
+            'services.apple' => [
+                'client_id' => 'new-id',
+                'client_secret' => 'new-secret',
+                'redirect' => '/new-callback',
+            ],
+            'services.sign_in_with_apple' => [
+                'client_id' => 'old-id',
+            ],
+        ]);
 
         $deprecationTriggered = false;
         set_error_handler(function ($errno) use (&$deprecationTriggered) {
@@ -91,7 +111,7 @@ class ConfigurationTest extends UnitTestCase
 
         $this->assertFalse(
             $deprecationTriggered,
-            'No deprecation notice should be triggered when login key is absent.'
+            'No deprecation notice should fire when the new config key exists.'
         );
     }
 }

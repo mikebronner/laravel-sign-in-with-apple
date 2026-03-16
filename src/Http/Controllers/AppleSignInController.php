@@ -34,7 +34,7 @@ class AppleSignInController extends Controller
         AppleSignInCallback::dispatch($user);
 
         $redirect = config(
-            'services.sign_in_with_apple.routes.callback_redirect',
+            'services.apple.routes.callback_redirect',
             '/',
         );
 

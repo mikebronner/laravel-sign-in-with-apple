@@ -135,12 +135,12 @@ We thank the following sponsors for their generosity, please take a moment to ch
 5. Set the necessary environment variables in your `.env` file:
 
     ```env
-    SIGN_IN_WITH_APPLE_REDIRECT="/apple/login/controller/callback/action"
-    SIGN_IN_WITH_APPLE_CLIENT_ID="your app's service id as registered with Apple"
-    SIGN_IN_WITH_APPLE_CLIENT_SECRET="your app's client secret as calculated in step 4"
+    APPLE_REDIRECT="/apple/login/controller/callback/action"
+    APPLE_CLIENT_ID="your app's service id as registered with Apple"
+    APPLE_CLIENT_SECRET="your app's client secret as calculated in step 4"
     ```
 
-    > **Note:** The `SIGN_IN_WITH_APPLE_LOGIN` environment variable has been removed.
+    > **Note:** The `APPLE_LOGIN` environment variable has been removed (previously `SIGN_IN_WITH_APPLE_LOGIN`).
     > Login routes should be defined in your application's route files instead.
     > See the [Migration Guide](#MigrationGuide) below if upgrading from an older version.
 
@@ -255,7 +255,7 @@ If you receive an error about a missing authorization code in the callback, chec
 
 2. **CSRF protection must be disabled for the callback** — Since Apple's POST doesn't include a CSRF token, Laravel will return a 419 error and the code will never reach your controller. See the [CSRF Exclusion](#CsrfExclusion) section above.
 
-3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
+3. **The redirect URL must exactly match** — The URL in your `.env` (`APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
 
 <a name="MigrationGuide"></a>
 ## Migration Guide
@@ -267,13 +267,14 @@ The configuration has been simplified. The following changes were made:
 | Old Key | New Behavior |
 |---------|-------------|
 | `SIGN_IN_WITH_APPLE_LOGIN` | **Removed.** Define your login route in your application's route files instead of the config. |
-| `SIGN_IN_WITH_APPLE_REDIRECT` | Unchanged — still used for the OAuth callback URL. |
-| `SIGN_IN_WITH_APPLE_CLIENT_ID` | Unchanged. |
-| `SIGN_IN_WITH_APPLE_CLIENT_SECRET` | Unchanged. |
+| `SIGN_IN_WITH_APPLE_REDIRECT` | Renamed to `APPLE_REDIRECT`. Old name still works as fallback. |
+| `SIGN_IN_WITH_APPLE_CLIENT_ID` | Renamed to `APPLE_CLIENT_ID`. Old name still works as fallback. |
+| `SIGN_IN_WITH_APPLE_CLIENT_SECRET` | Renamed to `APPLE_CLIENT_SECRET`. Old name still works as fallback. |
 
 **Steps to upgrade:**
 
 1. Remove `SIGN_IN_WITH_APPLE_LOGIN` from your `.env` file.
+2. Rename env vars: `SIGN_IN_WITH_APPLE_REDIRECT` → `APPLE_REDIRECT`, `SIGN_IN_WITH_APPLE_CLIENT_ID` → `APPLE_CLIENT_ID`, `SIGN_IN_WITH_APPLE_CLIENT_SECRET` → `APPLE_CLIENT_SECRET`. The old names continue to work as fallbacks.
 2. If you relied on the `login` config key for the `@signInWithApple` Blade directive button URL, define the route in your application's routes file and update the directive or link accordingly.
 3. The package will emit a `E_USER_DEPRECATED` notice if the old `login` key is still present, giving you time to migrate before it is fully removed.
 
@@ -301,7 +302,7 @@ be. My checklist for package development includes:
 
 ### `invalid_client` Error
 This means Apple rejected your credentials. Common causes:
-- **Wrong Client ID**: `SIGN_IN_WITH_APPLE_CLIENT_ID` must be your **Services ID** (not your App ID or Team ID).
+- **Wrong Client ID**: `APPLE_CLIENT_ID` must be your **Services ID** (not your App ID or Team ID).
 - **Wrong Client Secret**: The JWT must be signed with the correct private key, team ID, and key ID.
 - **Key revoked**: Check that your key is still active in your Apple Developer account under Keys.
 
@@ -309,16 +310,15 @@ This means Apple rejected your credentials. Common causes:
 This means the authorization code was rejected. Common causes:
 - **Code already used**: Apple authorization codes are single-use. If you refresh the callback page, the code will be invalid.
 - **Code expired**: Codes are valid for a short time (approximately 5 minutes).
-- **Redirect URI mismatch**: The `SIGN_IN_WITH_APPLE_REDIRECT` must exactly match the URL registered in your Apple Developer account.
+- **Redirect URI mismatch**: The `APPLE_REDIRECT` must exactly match the URL registered in your Apple Developer account.
 - **Client secret expired**: Apple client secret JWTs are valid for up to 6 months. Regenerate if expired.
 
 ### Missing Configuration
 If you see `Sign In With Apple is missing required config`, ensure you have set the following in your `.env`:
 ```
-SIGN_IN_WITH_APPLE_CLIENT_ID=your-services-id
-SIGN_IN_WITH_APPLE_CLIENT_SECRET=your-generated-jwt
-SIGN_IN_WITH_APPLE_REDIRECT=https://your-app.com/callback
-SIGN_IN_WITH_APPLE_LOGIN=/login/apple
+APPLE_CLIENT_ID=your-services-id
+APPLE_CLIENT_SECRET=your-generated-jwt
+APPLE_REDIRECT=https://your-app.com/callback
 ```
 
 ## Contributing
