@@ -180,7 +180,9 @@ Add the following blade directive to your login page:
 <a name="CsrfExclusion"></a>
 ### CSRF Exclusion
 
-Apple sends the authorization response as a **POST** request to your callback URL. This will trigger a `419 | Page Expired` (CSRF token mismatch) error unless you exclude the callback route from CSRF verification.
+Apple sends the authorization response as a **POST** request to your callback URL. This would normally trigger a `419 | Page Expired` (CSRF token mismatch) error. **This package automatically excludes the configured callback route from CSRF verification**, so no additional configuration is required.
+
+This is safe because Apple callbacks are validated via the OAuth `state` parameter, not CSRF tokens. If you need to manually exclude the route for any reason, you can use one of these approaches:
 
 **Option A: Exclude the route in your VerifyCsrfToken middleware** (Laravel 10 and earlier):
 
@@ -197,17 +199,6 @@ protected \$except = [
 Route::post('/apple/callback', [AppleSigninController::class, 'callback'])
     ->withoutMiddleware([\\Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken::class]);
 ```
-
-**Option C: Use the package's built-in middleware:**
-
-```php
-use GeneaLabs\\LaravelSignInWithApple\\Http\\Middleware\\DisableCsrfForAppleCallback;
-
-Route::post('/apple/callback', [AppleSigninController::class, 'callback'])
-    ->middleware(DisableCsrfForAppleCallback::class);
-```
-
-This is safe because Apple callbacks are validated via the OAuth `state` parameter, not CSRF tokens.
 
 <a name="Controller"></a>
 ### Controller
