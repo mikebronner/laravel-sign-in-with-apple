@@ -43,4 +43,4 @@ jobs:
           composer update --prefer-dist --no-interaction --no-progress
 
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --testsuite Feature,Unit
