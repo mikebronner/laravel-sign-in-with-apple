@@ -39,9 +39,15 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
      * The ServiceProvider calls VerifyCsrfToken::except() with the callback
      * path parsed from the configured redirect URI. This verifies the path
      * was actually registered as an exception.
+     *
+     * Note: VerifyCsrfToken::except() is only available in Laravel 11+.
      */
     public function testAppleCallbackPathIsInCsrfExclusionList(): void
     {
+        if (! method_exists(VerifyCsrfToken::class, 'except')) {
+            $this->markTestSkipped('VerifyCsrfToken::except() requires Laravel 11+');
+        }
+
         $middleware = $this->app->make(VerifyCsrfToken::class);
 
         // The configured redirect URI is http://testing.dev/siwa-callback
@@ -49,7 +55,7 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
         $callbackRequest = Request::create('/siwa-callback', 'POST');
         $protectedRequest = Request::create('/protected', 'POST');
 
-        // Use reflection to access the protected isReading + inExceptArray check
+        // Use reflection to access the protected inExceptArray method
         $reflection = new \ReflectionClass($middleware);
         $exceptMethod = $reflection->getMethod('inExceptArray');
         $exceptMethod->setAccessible(true);
@@ -73,6 +79,10 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
      */
     public function testOtherRoutesNotInCsrfExclusionList(): void
     {
+        if (! method_exists(VerifyCsrfToken::class, 'except')) {
+            $this->markTestSkipped('VerifyCsrfToken::except() requires Laravel 11+');
+        }
+
         $middleware = $this->app->make(VerifyCsrfToken::class);
         $reflection = new \ReflectionClass($middleware);
         $exceptMethod = $reflection->getMethod('inExceptArray');

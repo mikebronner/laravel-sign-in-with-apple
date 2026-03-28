@@ -60,8 +60,12 @@ class ServiceProvider extends LaravelServiceProvider
 
         $path = parse_url($redirectUri, PHP_URL_PATH) ?: $redirectUri;
 
-        // Use the static except() method to exclude the callback route from CSRF verification
-        VerifyCsrfToken::except($path);
+        // VerifyCsrfToken::except() is available in Laravel 11+.
+        // For Laravel 10 and earlier, users must manually exclude the route
+        // (documented in README under "Option A").
+        if (method_exists(VerifyCsrfToken::class, 'except')) {
+            VerifyCsrfToken::except($path);
+        }
     }
 
     public function bootSocialiteDriver()
