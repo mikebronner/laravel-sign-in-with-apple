@@ -59,11 +59,11 @@ class ClientSecretGenerator
     }
 
     /**
-     * Generate a client secret using values from the Laravel config/env.
+     * Generate a client secret using values from the Laravel config.
      *
-     * Expected env vars:
-     *   APPLE_TEAM_ID, APPLE_CLIENT_ID (or SIGN_IN_WITH_APPLE_CLIENT_ID),
-     *   APPLE_KEY_ID, APPLE_PRIVATE_KEY_PATH (or APPLE_PRIVATE_KEY)
+     * All values are read via config() to ensure compatibility with
+     * config caching (php artisan config:cache). Set the corresponding
+     * SIGN_IN_WITH_APPLE_* env vars in your .env file.
      *
      * @param int $ttlDays Token validity in days (max 180)
      *
@@ -71,12 +71,12 @@ class ClientSecretGenerator
      */
     public static function fromConfig(int $ttlDays = 180): string
     {
-        $teamId = config('services.sign_in_with_apple.team_id', env('APPLE_TEAM_ID', ''));
-        $clientId = config('services.sign_in_with_apple.client_id', env('APPLE_CLIENT_ID', ''));
-        $keyId = config('services.sign_in_with_apple.key_id', env('APPLE_KEY_ID', ''));
+        $teamId = config('services.sign_in_with_apple.team_id', '');
+        $clientId = config('services.sign_in_with_apple.client_id', '');
+        $keyId = config('services.sign_in_with_apple.key_id', '');
 
-        $privateKeyPath = env('APPLE_PRIVATE_KEY_PATH', '');
-        $privateKey = env('APPLE_PRIVATE_KEY', '');
+        $privateKeyPath = config('services.sign_in_with_apple.private_key_path', '');
+        $privateKey = config('services.sign_in_with_apple.private_key', '');
 
         if ($privateKeyPath && file_exists($privateKeyPath)) {
             $privateKey = file_get_contents($privateKeyPath);

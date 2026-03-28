@@ -163,9 +163,9 @@ config(['services.sign_in_with_apple.client_secret' => $secret]);
 
 Required env vars for `fromConfig()`:
 ```env
-APPLE_TEAM_ID=your-team-id
-APPLE_KEY_ID=your-key-id
-APPLE_PRIVATE_KEY_PATH=/path/to/key.p8
+SIGN_IN_WITH_APPLE_TEAM_ID=your-team-id
+SIGN_IN_WITH_APPLE_KEY_ID=your-key-id
+SIGN_IN_WITH_APPLE_PRIVATE_KEY_PATH=/path/to/key.p8
 ```
 
 5. Set the necessary environment variables in your `.env` file:
