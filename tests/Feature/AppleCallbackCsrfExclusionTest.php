@@ -3,6 +3,8 @@
 namespace GeneaLabs\LaravelSignInWithApple\Tests\Feature;
 
 use GeneaLabs\LaravelSignInWithApple\Tests\UnitTestCase;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 class AppleCallbackCsrfExclusionTest extends UnitTestCase
@@ -10,7 +12,6 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Register routes in setUp so they're available for each test
         $this->registerTestRoutes();
     }
 
@@ -33,22 +34,59 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
     }
 
     /**
-     * Test that the callback route handles POST from Apple without CSRF token.
-     * 
-     * Simulates the exact flow: Apple POSTs to the callback without a CSRF token.
-     * If CSRF is not excluded, this would return 419.
+     * Test that the Apple callback route is in the CSRF exclusion list.
+     *
+     * The ServiceProvider calls VerifyCsrfToken::except() with the callback
+     * path parsed from the configured redirect URI. This verifies the path
+     * was actually registered as an exception.
      */
-    public function testAppleCallbackBypassesCsrfVerification(): void
+    public function testAppleCallbackPathIsInCsrfExclusionList(): void
     {
-        // This is the critical test: POST without _token, no 419 error
-        $response = $this->post('/apple/callback', [
-            'code' => 'auth-code-abc123',
-            'state' => 'state-xyz789',
-        ]);
+        $middleware = $this->app->make(VerifyCsrfToken::class);
 
-        // Should succeed (200), not trigger CSRF error (419)
-        $this->assertNotEquals(419, $response->getStatusCode());
-        $this->assertEquals('callback received', $response->getContent());
+        // The configured redirect URI is http://testing.dev/siwa-callback
+        // so the excluded path should be /siwa-callback
+        $callbackRequest = Request::create('/siwa-callback', 'POST');
+        $protectedRequest = Request::create('/protected', 'POST');
+
+        // Use reflection to access the protected isReading + inExceptArray check
+        $reflection = new \ReflectionClass($middleware);
+        $exceptMethod = $reflection->getMethod('inExceptArray');
+        $exceptMethod->setAccessible(true);
+
+        $this->assertTrue(
+            $exceptMethod->invoke($middleware, $callbackRequest),
+            'Apple callback path should be in the CSRF exclusion list'
+        );
+
+        $this->assertFalse(
+            $exceptMethod->invoke($middleware, $protectedRequest),
+            'Non-Apple routes should NOT be in the CSRF exclusion list'
+        );
+    }
+
+    /**
+     * Test that other routes are not affected by the CSRF exclusion.
+     *
+     * Verifies that only the Apple callback path is excluded and arbitrary
+     * routes remain subject to CSRF verification.
+     */
+    public function testOtherRoutesNotInCsrfExclusionList(): void
+    {
+        $middleware = $this->app->make(VerifyCsrfToken::class);
+        $reflection = new \ReflectionClass($middleware);
+        $exceptMethod = $reflection->getMethod('inExceptArray');
+        $exceptMethod->setAccessible(true);
+
+        $routes = ['/protected', '/login', '/admin/settings', '/api/webhook'];
+
+        foreach ($routes as $route) {
+            $request = Request::create($route, 'POST');
+            $this->assertFalse(
+                $exceptMethod->invoke($middleware, $request),
+                "Route {$route} should NOT be in the CSRF exclusion list"
+            );
+        }
     }
 
     protected function registerTestRoutes(): void
@@ -59,10 +97,6 @@ class AppleCallbackCsrfExclusionTest extends UnitTestCase
 
         Route::post('/protected', function () {
             return 'protected received';
-        })->middleware('web');
-
-        Route::post('/custom-apple-callback', function () {
-            return 'custom callback received';
         })->middleware('web');
     }
 }

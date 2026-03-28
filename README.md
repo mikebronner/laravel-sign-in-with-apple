@@ -188,7 +188,7 @@ This is safe because Apple callbacks are validated via the OAuth `state` paramet
 
 ```php
 // app/Http/Middleware/VerifyCsrfToken.php
-protected \$except = [
+protected $except = [
     '/apple/callback', // or whatever your callback URL is
 ];
 ```
