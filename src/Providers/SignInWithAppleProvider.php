@@ -153,7 +153,20 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     public function user()
     {
-        $response = $this->getAccessTokenResponse($this->getCode());
+        $code = $this->getCode();
+
+        if (empty($code)) {
+            throw new \RuntimeException(
+                'Apple Sign In callback did not receive an authorization code. '
+                . 'Apple uses response_mode=form_post, so the code is sent via POST body, not URL parameters. '
+                . 'Ensure your callback route accepts POST requests and that the Apple callback URL '
+                . 'is correctly configured in your Apple Developer account. '
+                . 'If you are using CSRF protection, exclude the callback route from verification '
+                . '(Apple POST requests do not include a CSRF token).'
+            );
+        }
+
+        $response = $this->getAccessTokenResponse($code);
 
         $user = $this->mapUserToObject($this->getUserByToken(
             Arr::get($response, 'id_token')

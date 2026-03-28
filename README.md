@@ -211,6 +211,17 @@ class AppleSigninController extends Controller
 
 Note that when processing the returned `$user` object, it is critical to know that the `sub` element is the unique identifier for the user, **NOT** the email address. For more details, visit https://developer.apple.com/documentation/signinwithapplerestapi/authenticating_users_with_sign_in_with_apple.
 
+
+### Missing Authorization Code
+
+If you receive an error about a missing authorization code in the callback, check:
+
+1. **Your callback route must accept POST requests** — Apple uses `response_mode=form_post`, which means the authorization code is sent as a POST form parameter, not a URL query parameter. Use `Route::post()`, not `Route::get()`.
+
+2. **CSRF protection must be disabled for the callback** — Since Apple's POST doesn't include a CSRF token, Laravel will return a 419 error and the code will never reach your controller. See the [CSRF Exclusion](#CsrfExclusion) section above.
+
+3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
+
 ----------
 
 #### Credits
