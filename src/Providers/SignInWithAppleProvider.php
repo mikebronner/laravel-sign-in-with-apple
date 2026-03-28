@@ -74,31 +74,6 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
         }
     }
 
-    public function getAccessToken($code)
-    {
-        $response = $this->getHttpClient()
-            ->post(
-                $this->getTokenUrl(),
-                [
-                    'headers' => [
-                        'Authorization' => 'Basic '. base64_encode(
-                            $this->clientId . ':' . $this->clientSecret
-                        ),
-                    ],
-                    'body' => $this->getTokenFields($code),
-                ]
-            );
-
-        return $this->parseAccessToken($response->getBody());
-    }
-
-    protected function parseAccessToken($response)
-    {
-        $data = $response->json();
-
-        return $data['access_token'];
-    }
-
     protected function getTokenFields($code)
     {
         $fields = parent::getTokenFields($code);
@@ -153,13 +128,6 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
     }
 
     /**
-     * Handle a ClientException from the Apple token endpoint.
-     *
-     * Parses the JSON error response and throws a descriptive exception.
-     *
-     * @throws InvalidAppleCredentialsException
-     */
-    /**
      * Handle a ServerException (5xx) from the Apple token endpoint.
      *
      * Apple's servers occasionally return 500 errors. This wraps them
@@ -181,6 +149,13 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
         );
     }
 
+    /**
+     * Handle a ClientException from the Apple token endpoint.
+     *
+     * Parses the JSON error response and throws a descriptive exception.
+     *
+     * @throws InvalidAppleCredentialsException
+     */
     protected function handleTokenError(ClientException $exception): never
     {
         $body = (string) $exception->getResponse()->getBody();

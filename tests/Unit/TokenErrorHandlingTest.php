@@ -84,5 +84,3 @@ class TokenErrorHandlingTest extends UnitTestCase
         }
     }
 }
-
-// Additional test appended for server error handling
