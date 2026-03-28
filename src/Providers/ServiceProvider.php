@@ -2,6 +2,7 @@
 
 namespace GeneaLabs\LaravelSignInWithApple\Providers;
 
+use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidAppleCredentialsException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Laravel\Socialite\Contracts\Factory;
@@ -37,10 +38,49 @@ class ServiceProvider extends LaravelServiceProvider
             function ($app) use ($socialite) {
                 $config = $app['config']['services.sign_in_with_apple'];
 
+                $this->validateAppleConfig($config);
+
                 return $socialite
                     ->buildProvider(SignInWithAppleProvider::class, $config);
             }
         );
+    }
+
+    /**
+     * Validate that required Apple Sign In config values are present and non-empty.
+     *
+     * @throws InvalidAppleCredentialsException
+     */
+    protected function validateAppleConfig(?array $config): void
+    {
+        if (empty($config)) {
+            throw new InvalidAppleCredentialsException(
+                'Sign In With Apple configuration is missing. '
+                . 'Publish the config and set SIGN_IN_WITH_APPLE_CLIENT_ID and SIGN_IN_WITH_APPLE_CLIENT_SECRET in your .env file.',
+                ['config' => null],
+            );
+        }
+
+        $missing = [];
+
+        foreach (['client_id', 'client_secret'] as $key) {
+            if (empty($config[$key])) {
+                $missing[] = $key;
+            }
+        }
+
+        if (! empty($missing)) {
+            $envKeys = array_map(
+                fn (string $key) => 'SIGN_IN_WITH_APPLE_' . strtoupper($key),
+                $missing,
+            );
+
+            throw new InvalidAppleCredentialsException(
+                'Sign In With Apple is missing required config: ' . implode(', ', $missing)
+                . '. Set ' . implode(' and ', $envKeys) . ' in your .env file.',
+                ['missing' => $missing],
+            );
+        }
     }
 
     public function bootBladeDirective()
