@@ -68,7 +68,8 @@ class ServiceProvider extends LaravelServiceProvider
             VerifyCsrfToken::except($path);
         }
     }
-
+    
+    /**
      * Migrate deprecated config keys to their new equivalents.
      *
      * The `login` key has been removed — routes should be defined in your
