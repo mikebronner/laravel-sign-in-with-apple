@@ -3,7 +3,6 @@
 namespace GeneaLabs\LaravelSignInWithApple\Tests;
 
 use Illuminate\Contracts\Http\Kernel;
-use Orchestra\Testbench\Dusk\Options;
 use Illuminate\Session\Middleware\StartSession;
 use Laravel\Socialite\SocialiteServiceProvider;
 use GeneaLabs\LaravelSignInWithApple\Providers\ServiceProvider;
@@ -15,15 +14,12 @@ trait CreatesApplication
     {
         parent::setUp();
 
-        Options::withUI();
-        $this->artisan("view:clear");
         $this->artisan("cache:clear");
         $this->artisan("config:clear");
     }
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('database.redis.client', "predis");
         $app->make(Kernel::class)
             ->pushMiddleware(StartSession::class);
 
