@@ -124,9 +124,16 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
 
     protected function getUserByToken($token)
     {
-        $claims = explode('.', $token)[1];
+        $parts = explode('.', $token);
 
-        return json_decode(base64_decode($claims), true);
+        if (count($parts) < 2) {
+            return [];
+        }
+
+        $claims = $parts[1];
+        $decoded = base64_decode(strtr($claims, '-_', '+/'));
+
+        return json_decode($decoded, true) ?: [];
     }
 
     public function user()
@@ -161,11 +168,13 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
         $firstName = null;
         $lastName = null;
         $fullName = null;
+        $isReturningUser = true;
 
         if (request()->filled("user")) {
             $userRequest = json_decode(request("user"), true);
 
             if (is_array($userRequest) && array_key_exists("name", $userRequest)) {
+                $isReturningUser = false;
                 $user["name"] = $userRequest["name"];
                 $firstName = $user["name"]['firstName'] ?? null;
                 $lastName = $user["name"]['lastName'] ?? null;
@@ -174,13 +183,14 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
         }
 
         return (new User)
-            ->setRaw($user)
+            ->setRaw(array_merge($user, ['is_returning_user' => $isReturningUser]))
             ->map([
                 "id" => $user["sub"],
                 "name" => $fullName,
                 "first_name" => $firstName,
                 "last_name" => $lastName,
                 "email" => $user["email"] ?? null,
+                "is_returning_user" => $isReturningUser,
             ]);
     }
 

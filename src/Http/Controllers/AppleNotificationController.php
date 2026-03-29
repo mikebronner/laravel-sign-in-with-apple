@@ -2,10 +2,15 @@
 
 namespace GeneaLabs\LaravelSignInWithApple\Http\Controllers;
 
+use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use GeneaLabs\LaravelSignInWithApple\Events\AppleAccessRevoked;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use UnexpectedValueException;
 
 /**
  * Handles Apple's server-to-server notifications.
@@ -51,21 +56,36 @@ class AppleNotificationController extends Controller
     }
 
     /**
-     * Decode the JWT payload from Apple (without signature verification for now).
+     * Decode and verify the JWT payload from Apple.
      *
-     * Apple signs notifications with their public keys. For production use,
-     * you should verify the JWT signature against Apple's public keys.
+     * Verifies the JWT signature against Apple's public keys fetched from
+     * https://appleid.apple.com/auth/keys. Keys are cached for 1 hour.
      */
     protected function decodePayload(string $jwt): ?array
     {
-        $parts = explode('.', $jwt);
+        try {
+            $keys = $this->getApplePublicKeys();
+            $decoded = JWT::decode($jwt, JWK::parseKeySet($keys));
 
-        if (count($parts) !== 3) {
+            return (array) json_decode(json_encode($decoded), true);
+        } catch (UnexpectedValueException) {
             return null;
         }
+    }
 
-        $claims = json_decode(base64_decode($parts[1]), true);
+    /**
+     * Fetch Apple's public keys for JWT verification, cached for 1 hour.
+     */
+    protected function getApplePublicKeys(): array
+    {
+        return Cache::remember('apple-auth-keys', 3600, function () {
+            $response = Http::get('https://appleid.apple.com/auth/keys');
 
-        return is_array($claims) ? $claims : null;
+            if (! $response->successful()) {
+                throw new UnexpectedValueException('Unable to fetch Apple public keys.');
+            }
+
+            return $response->json();
+        });
     }
 }
