@@ -1,8 +1,10 @@
 /vendor
 .phpunit.cache/
 .phpunit.result.cache
+.phpunit.cache/
 composer.lock
 phpmd.xml
 phpunit.xml
 /tests/Browser/screenshots
+.phpunit.cache/
 .phpunit.cache/
