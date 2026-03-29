@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Laravel 13 support.
+
+### Fixed
+- Composer dependency constraints for `orchestra/testbench-browser-kit` and `orchestra/testbench-dusk` (added missing `^9.0` for Laravel 11 compatibility).
+
 ## [0.4.4] - 2020-09-04
 ### Changed
 - storing of `access_token` to `id_token`.
