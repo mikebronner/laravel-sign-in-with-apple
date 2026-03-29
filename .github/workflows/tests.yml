@@ -47,4 +47,7 @@ jobs:
           composer update --prefer-dist --no-interaction --no-progress
 
       - name: Run tests
+        env:
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
         run: vendor/bin/phpunit --testsuite=Unit,Feature
