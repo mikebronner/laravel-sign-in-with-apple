@@ -3,6 +3,7 @@
 namespace GeneaLabs\LaravelSignInWithApple\Providers;
 
 use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidAppleCredentialsException;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Laravel\Socialite\Contracts\Factory;
@@ -17,6 +18,7 @@ class ServiceProvider extends LaravelServiceProvider
         $this->loadRoutesIf(config('services.sign_in_with_apple.routes.enabled', true));
         $this->bootSocialiteDriver();
         $this->bootBladeDirective();
+        $this->excludeCallbackFromCsrf();
     }
 
     public function register()
@@ -42,6 +44,31 @@ class ServiceProvider extends LaravelServiceProvider
         }
     }
 
+    /**
+     * Automatically exclude the Apple callback route from CSRF verification.
+     *
+     * Apple sends the authorization response as a POST request to the callback
+     * URL without a CSRF token, which triggers a 419 error. The OAuth `state`
+     * parameter provides equivalent protection against cross-site forgery.
+     */
+    protected function excludeCallbackFromCsrf(): void
+    {
+        $redirectUri = config('services.sign_in_with_apple.redirect');
+
+        if (! $redirectUri) {
+            return;
+        }
+
+        $path = parse_url($redirectUri, PHP_URL_PATH) ?: $redirectUri;
+
+        // VerifyCsrfToken::except() is available in Laravel 11+.
+        // For Laravel 10 and earlier, users must manually exclude the route
+        // (documented in README under "Option A").
+        if (method_exists(VerifyCsrfToken::class, 'except')) {
+            VerifyCsrfToken::except($path);
+        }
+    }
+    
     /**
      * Migrate deprecated config keys to their new equivalents.
      *
