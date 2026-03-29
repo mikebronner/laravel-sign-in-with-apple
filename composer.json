@@ -24,8 +24,8 @@
         "orchestra/testbench-browser-kit": "^8.5|^9.0|^10.0|^11.0",
         "orchestra/testbench-dusk": "^8.22|^9.0|^10.0|^11.0",
         "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
-        "predis/predis": "^2.1",
-        "phpunit/phpunit": "^9.5.10|^10.5|^11.5.3"
+        "predis/predis": "^2.1|^3.4",
+        "phpunit/phpunit": "^9.5.10|^10.5|^11.5.3|^12.5.12"
     },
     "autoload": {
         "psr-4": {
