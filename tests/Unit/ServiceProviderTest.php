@@ -21,7 +21,7 @@ class ServiceProviderTest extends UnitTestCase
     public function test_config_is_merged(): void
     {
         $this->assertNotNull(config('services.sign_in_with_apple'));
-        $this->assertArrayHasKey('login', config('services.sign_in_with_apple'));
+        $this->assertArrayNotHasKey('login', config('services.sign_in_with_apple'));
         $this->assertArrayHasKey('redirect', config('services.sign_in_with_apple'));
         $this->assertArrayHasKey('client_id', config('services.sign_in_with_apple'));
         $this->assertArrayHasKey('client_secret', config('services.sign_in_with_apple'));
