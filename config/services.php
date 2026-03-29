@@ -11,6 +11,7 @@ return [
             "enabled" => true,
             "redirect_route" => "apple/redirect",
             "callback_route" => "apple/callback",
+            "callback_redirect" => "/",
         ],
     ],
 ];

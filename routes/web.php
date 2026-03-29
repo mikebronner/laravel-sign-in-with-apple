@@ -1,6 +1,7 @@
 <?php
 
 use GeneaLabs\LaravelSignInWithApple\Http\Controllers\AppleSignInController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -13,5 +14,6 @@ Route::group([
         ->name('apple.redirect');
 
     Route::post($callbackPath, [AppleSignInController::class, 'callback'])
+        ->withoutMiddleware([VerifyCsrfToken::class])
         ->name('apple.callback');
 });
