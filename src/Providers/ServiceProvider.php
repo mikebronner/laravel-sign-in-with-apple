@@ -44,12 +44,13 @@ class ServiceProvider extends LaravelServiceProvider
     public function bootSocialiteDriver()
     {
         $socialite = $this->app->make(Factory::class);
+        $serviceProvider = $this;
         $socialite->extend(
             'sign-in-with-apple',
-            function ($app) use ($socialite) {
+            function ($app) use ($socialite, $serviceProvider) {
                 $config = $app['config']['services.sign_in_with_apple'];
 
-                $this->validateAppleConfig($config);
+                $serviceProvider->validateAppleConfig($config);
 
                 return $socialite
                     ->buildProvider(SignInWithAppleProvider::class, $config);
@@ -62,7 +63,7 @@ class ServiceProvider extends LaravelServiceProvider
      *
      * @throws InvalidAppleCredentialsException
      */
-    protected function validateAppleConfig(?array $config): void
+    public function validateAppleConfig(?array $config): void
     {
         if (empty($config)) {
             throw new InvalidAppleCredentialsException(
