@@ -21,10 +21,19 @@ We thank the following sponsors for their generosity, please take a moment to ch
 <a name="Requirements"></a>
 ## Requirements
 
-- PHP 7.3+
-- Laravel 8.0+
+- PHP 8.2+
+- Laravel 10.0+
 - Socialite 5.0+
 - Apple Developer Subscription
+
+### Version Support
+
+| Laravel | PHP       | Package |
+|---------|-----------|----------|
+| 10.x    | 8.2+      | 5.x     |
+| 11.x    | 8.2+      | 5.x     |
+| 12.x    | 8.2+      | 5.x     |
+| 13.x    | 8.3+      | 5.x     |
 
 <a name="Installation"></a>
 ## Installation
@@ -132,6 +141,23 @@ We thank the following sponsors for their generosity, please take a moment to ch
     SIGN_IN_WITH_APPLE_CLIENT_SECRET="your app's client secret as calculated in step 4"
     ```
 
+
+### Redirect URL Requirements
+
+Apple has strict requirements for the redirect (callback) URL:
+
+- **Must use HTTPS** — HTTP is rejected in production. Only `http://localhost` is allowed for local development.
+- **Must exactly match** the Return URL registered in your Apple Developer account under Services ID configuration.
+- **No query parameters** — Apple will reject URLs with query strings.
+- **No fragments** — Hash fragments are not supported.
+
+The package validates your redirect URL at auth initiation and throws an `InvalidRedirectUrlException` with a clear error message if it doesn't meet these requirements.
+
+Common mistakes:
+- Using `http://` instead of `https://` in production
+- Having a trailing slash mismatch between config and Apple Developer Console
+- Forgetting to add the URL to your Services ID in the Apple Developer portal
+
 <a name="Implementation"></a>
 ## Implementation
 
@@ -194,6 +220,17 @@ class AppleSigninController extends Controller
 
 Note that when processing the returned `$user` object, it is critical to know that the `sub` element is the unique identifier for the user, **NOT** the email address. For more details, visit https://developer.apple.com/documentation/signinwithapplerestapi/authenticating_users_with_sign_in_with_apple.
 
+
+### Missing Authorization Code
+
+If you receive an error about a missing authorization code in the callback, check:
+
+1. **Your callback route must accept POST requests** — Apple uses `response_mode=form_post`, which means the authorization code is sent as a POST form parameter, not a URL query parameter. Use `Route::post()`, not `Route::get()`.
+
+2. **CSRF protection must be disabled for the callback** — Since Apple's POST doesn't include a CSRF token, Laravel will return a 419 error and the code will never reach your controller. See the [CSRF Exclusion](#CsrfExclusion) section above.
+
+3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
+
 ----------
 
 #### Credits
@@ -213,6 +250,30 @@ be. My checklist for package development includes:
 -   ✅ Provide an up-to-date CHANGELOG.md which adheres to the format outlined
     at <http://keepachangelog.com>.
 -   ✅ Have no PHPMD or PHPCS warnings throughout all code.
+
+## Troubleshooting
+
+### `invalid_client` Error
+This means Apple rejected your credentials. Common causes:
+- **Wrong Client ID**: `SIGN_IN_WITH_APPLE_CLIENT_ID` must be your **Services ID** (not your App ID or Team ID).
+- **Wrong Client Secret**: The JWT must be signed with the correct private key, team ID, and key ID.
+- **Key revoked**: Check that your key is still active in your Apple Developer account under Keys.
+
+### `invalid_grant` Error
+This means the authorization code was rejected. Common causes:
+- **Code already used**: Apple authorization codes are single-use. If you refresh the callback page, the code will be invalid.
+- **Code expired**: Codes are valid for a short time (approximately 5 minutes).
+- **Redirect URI mismatch**: The `SIGN_IN_WITH_APPLE_REDIRECT` must exactly match the URL registered in your Apple Developer account.
+- **Client secret expired**: Apple client secret JWTs are valid for up to 6 months. Regenerate if expired.
+
+### Missing Configuration
+If you see `Sign In With Apple is missing required config`, ensure you have set the following in your `.env`:
+```
+SIGN_IN_WITH_APPLE_CLIENT_ID=your-services-id
+SIGN_IN_WITH_APPLE_CLIENT_SECRET=your-generated-jwt
+SIGN_IN_WITH_APPLE_REDIRECT=https://your-app.com/callback
+SIGN_IN_WITH_APPLE_LOGIN=/login/apple
+```
 
 ## Contributing
 Please observe and respect all aspects of the included [Code of Conduct](https://github.com/GeneaLabs/laravel-sign-in-with-apple/blob/master/CODE_OF_CONDUCT.md).
