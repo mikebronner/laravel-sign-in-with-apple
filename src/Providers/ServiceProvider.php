@@ -13,6 +13,7 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
+        $this->loadRoutesIf(config('services.sign_in_with_apple.routes.enabled', true));
         $this->bootSocialiteDriver();
         $this->bootBladeDirective();
     }
@@ -28,6 +29,16 @@ class ServiceProvider extends LaravelServiceProvider
             __DIR__ . '/../../config/services.php',
             'services'
         );
+    }
+
+    /**
+     * Load package routes if enabled in config.
+     */
+    protected function loadRoutesIf(bool $enabled): void
+    {
+        if ($enabled) {
+            $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+        }
     }
 
     public function bootSocialiteDriver()
