@@ -40,7 +40,7 @@ class SignInFlowTest extends UnitTestCase
 
         $targetUrl = $response->getTargetUrl();
         $this->assertStringContainsString('redirect_uri=', $targetUrl);
-        $this->assertStringContainsString(urlencode('http://testing.dev/siwa-callback'), $targetUrl);
+        $this->assertStringContainsString(urlencode('https://testing.dev/siwa-callback'), $targetUrl);
     }
 
     public function testCallbackWithMockedTokenResponse(): void
