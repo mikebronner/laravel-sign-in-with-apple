@@ -5,6 +5,7 @@ namespace GeneaLabs\LaravelSignInWithApple\Providers;
 use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidRedirectUrlException;
 use GeneaLabs\LaravelSignInWithApple\Exceptions\InvalidAppleCredentialsException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Arr;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -108,32 +109,9 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
             return parent::getAccessTokenResponse($code);
         } catch (ClientException $e) {
             $this->handleTokenError($e);
+        } catch (ServerException $e) {
+            $this->handleServerError($e);
         }
-    }
-
-    public function getAccessToken($code)
-    {
-        $response = $this->getHttpClient()
-            ->post(
-                $this->getTokenUrl(),
-                [
-                    'headers' => [
-                        'Authorization' => 'Basic '. base64_encode(
-                            $this->clientId . ':' . $this->clientSecret
-                        ),
-                    ],
-                    'body' => $this->getTokenFields($code),
-                ]
-            );
-
-        return $this->parseAccessToken($response->getBody());
-    }
-
-    protected function parseAccessToken($response)
-    {
-        $data = $response->json();
-
-        return $data['access_token'];
     }
 
     protected function getTokenFields($code)
@@ -204,6 +182,28 @@ class SignInWithAppleProvider extends AbstractProvider implements ProviderInterf
                 "last_name" => $lastName,
                 "email" => $user["email"] ?? null,
             ]);
+    }
+
+    /**
+     * Handle a ServerException (5xx) from the Apple token endpoint.
+     *
+     * Apple's servers occasionally return 500 errors. This wraps them
+     * in a descriptive exception so apps can handle them gracefully.
+     *
+     * @throws \RuntimeException
+     */
+    protected function handleServerError(ServerException $exception): never
+    {
+        $statusCode = $exception->getResponse()->getStatusCode();
+
+        throw new \RuntimeException(
+            "Apple Sign In is temporarily unavailable (HTTP {$statusCode}). "
+            . 'Apple\'s authentication servers returned a server error. '
+            . 'This is typically a temporary issue on Apple\'s side. '
+            . 'Please try again in a few minutes.',
+            $statusCode,
+            $exception,
+        );
     }
 
     /**
