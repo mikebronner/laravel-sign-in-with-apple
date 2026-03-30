@@ -157,11 +157,11 @@ class ClientSecretGeneratorTest extends UnitTestCase
         $privateKey = $this->generateTestKey();
 
         config([
-            'services.sign_in_with_apple.team_id' => 'CONFIG_TEAM',
-            'services.sign_in_with_apple.client_id' => 'com.config.service',
-            'services.sign_in_with_apple.key_id' => 'CONFIG_KEY',
-            'services.sign_in_with_apple.private_key' => $privateKey,
-            'services.sign_in_with_apple.private_key_path' => '',
+            'services.apple.sign_in.team_id' => 'CONFIG_TEAM',
+            'services.apple.sign_in.client_id' => 'com.config.service',
+            'services.apple.sign_in.key_id' => 'CONFIG_KEY',
+            'services.apple.sign_in.private_key' => $privateKey,
+            'services.apple.sign_in.private_key_path' => '',
         ]);
 
         $jwt = ClientSecretGenerator::fromConfig(ttlDays: 30);
@@ -180,11 +180,11 @@ class ClientSecretGeneratorTest extends UnitTestCase
         file_put_contents($tempFile, $privateKey);
 
         config([
-            'services.sign_in_with_apple.team_id' => 'TEAM_PATH',
-            'services.sign_in_with_apple.client_id' => 'com.path.service',
-            'services.sign_in_with_apple.key_id' => 'KEY_PATH',
-            'services.sign_in_with_apple.private_key' => 'this-would-fail-if-used',
-            'services.sign_in_with_apple.private_key_path' => $tempFile,
+            'services.apple.sign_in.team_id' => 'TEAM_PATH',
+            'services.apple.sign_in.client_id' => 'com.path.service',
+            'services.apple.sign_in.key_id' => 'KEY_PATH',
+            'services.apple.sign_in.private_key' => 'this-would-fail-if-used',
+            'services.apple.sign_in.private_key_path' => $tempFile,
         ]);
 
         $jwt = ClientSecretGenerator::fromConfig();
@@ -201,11 +201,11 @@ class ClientSecretGeneratorTest extends UnitTestCase
     public function testFromConfigThrowsWhenKeyPathSetButFileMissing(): void
     {
         config([
-            'services.sign_in_with_apple.team_id' => 'TEAM123',
-            'services.sign_in_with_apple.client_id' => 'com.example.service',
-            'services.sign_in_with_apple.key_id' => 'KEY456',
-            'services.sign_in_with_apple.private_key' => 'fallback-key',
-            'services.sign_in_with_apple.private_key_path' => '/nonexistent/path/key.p8',
+            'services.apple.sign_in.team_id' => 'TEAM123',
+            'services.apple.sign_in.client_id' => 'com.example.service',
+            'services.apple.sign_in.key_id' => 'KEY456',
+            'services.apple.sign_in.private_key' => 'fallback-key',
+            'services.apple.sign_in.private_key_path' => '/nonexistent/path/key.p8',
         ]);
 
         $this->expectException(InvalidArgumentException::class);

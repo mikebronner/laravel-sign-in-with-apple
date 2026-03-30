@@ -72,7 +72,7 @@ class RouteRegistrationTest extends UnitTestCase
 
     public function testRoutesAreNotRegisteredWhenDisabled(): void
     {
-        $this->app['config']->set('services.sign_in_with_apple.routes.enabled', false);
+        $this->app['config']->set('services.apple.sign_in.routes.enabled', false);
 
         // Clear routes and re-boot the service provider with routes disabled
         $this->app['router']->setRoutes(new \Illuminate\Routing\RouteCollection());
@@ -89,7 +89,7 @@ class RouteRegistrationTest extends UnitTestCase
 
     public function testRedirectRoutePathCanBeCustomized(): void
     {
-        $this->app['config']->set('services.sign_in_with_apple.routes.redirect_route', 'auth/apple/login');
+        $this->app['config']->set('services.apple.sign_in.routes.redirect_route', 'auth/apple/login');
 
         $this->reloadRoutes();
 
@@ -102,7 +102,7 @@ class RouteRegistrationTest extends UnitTestCase
 
     public function testCallbackRoutePathCanBeCustomized(): void
     {
-        $this->app['config']->set('services.sign_in_with_apple.routes.callback_route', 'auth/apple/handle');
+        $this->app['config']->set('services.apple.sign_in.routes.callback_route', 'auth/apple/handle');
 
         $this->reloadRoutes();
 
