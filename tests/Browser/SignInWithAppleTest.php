@@ -22,7 +22,7 @@ class SignInWithAppleTest extends BrowserTestCase
             $browser
                 ->visit("/tests")
                 ->click('#sign-in-with-apple')
-                ->assertSee("Use your Apple ID to sign in to Test Service ID.");
+                ->assertPathBeginsWith('/siwa-callback');
         });
     }
 }

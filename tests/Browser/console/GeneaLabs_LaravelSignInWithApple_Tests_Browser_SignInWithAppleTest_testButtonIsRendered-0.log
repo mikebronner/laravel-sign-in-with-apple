@@ -1,8 +1,14 @@
 [
     {
-        "level": "SEVERE",
-        "message": "http:\/\/127.0.0.1:8000\/favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "source": "network",
-        "timestamp": 1583082983760
+        "level": "WARNING",
+        "message": "http:\/\/127.0.0.1:8001\/tests - Failed to decode downloaded font: data:application\/x-font-woff;charset=utf-8;base64,d09GRgABAAAAABRMABEAAAAAIawAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABHUE9TAAATFAAAALsAAAHIbUB2PEdTVUIAABPQAAAAZQAAAIxKSyvpT1MvMgAACjgAAABNAAAAYHLeeipic2xuAAAUOAAAABMAAABI\/ykCnmNtYXAAAAqIAAAArAAAATzUgYTCY3Z0IAAAEagAAACGAAAA\/h4jsglmcGdtAAALNAAABcMAAAviP64gqWdhc3AAABMMAAAACAAAAAgAAAAQZ2x5ZgAAAYAAAAfMAAAMDN+ERypoZWFkAAAJlAAAADYAAAA2FZUeyWhoZWEAAAoYAAAAIAAAACQQagbMaG10eAAACcwAAABMAAAATFWqCFBsb2NhAAAJbAAAACgAAAAoG5oe821heHAAAAlMAAAAIAAAACABaQyMbmFtZQAAEjAAAADFAAABhhtRNi1wb...0IQ2XzXnn7yuvSUW0L\/9kXpBkTdbF+9L37sSPb8Jyvv8\/fASPuNJwAAAB4nGNgZgCDfzcYZjFgAQA4VwJ0AAABAAH\/\/wAPeJyNUDEOwjAMPCcF2lQChPoAHsDICxBiYmRkQYiJqkPFAH9jZGIF8RIWxGAuKVI7dGhOsZ3zObINAeCwwBZ2uVpvkO0vZY5pvjsVmCFiFqrwqjqWRmxgj4eyQNa0TEq4EZLg46AEvRHjq2Uic6QE9Ko34q5ntB59tfMtyo8+O2sfXZW+A\/b3bbzf1fzdav++ns4E+L2kGIfNWAyrTfLfHvoE6AdETJ0LuRFZIeNrPZvQOsauqvoB5z0tQgB4nGNgZGBg4GKIYihhYHZx8wlhEEmuLMphkMtJLMljUGJgAcoy\/P\/PAAPMjlGuCgxizkEhCgxyIUHeCgxqYHlGqDpGEAtMMzEw5+Qn5zCIIJNARYxgzAKlOYCYDawLyAYAAaIWnAAAAHicY2BkgAKmef81GMgGAGutAckA",
+        "source": "other",
+        "timestamp": 1774829244514
+    },
+    {
+        "level": "WARNING",
+        "message": "http:\/\/127.0.0.1:8001\/tests - OTS parsing error: name: Failed to parse table",
+        "source": "other",
+        "timestamp": 1774829244514
     }
 ]
