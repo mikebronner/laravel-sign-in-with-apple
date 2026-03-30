@@ -8,10 +8,10 @@ class ConfigTest extends UnitTestCase
 {
     public function testNewConfigKeysAreUsed(): void
     {
-        $this->assertNotNull(config('services.apple'));
-        $this->assertEquals('http://testing.dev/siwa-callback', config('services.apple.redirect'));
-        $this->assertEquals('add-your-own', config('services.apple.client_id'));
-        $this->assertEquals('add-your-own', config('services.apple.client_secret'));
+        $this->assertNotNull(config('services.apple.sign_in'));
+        $this->assertEquals('https://testing.dev/siwa-callback', config('services.apple.sign_in.redirect'));
+        $this->assertEquals('add-your-own', config('services.apple.sign_in.client_id'));
+        $this->assertEquals('add-your-own', config('services.apple.sign_in.client_secret'));
     }
 
     public function testSocialiteDriverWorksWithNewConfigKeys(): void
@@ -28,7 +28,7 @@ class ConfigTest extends UnitTestCase
     {
         // Clear the new key and set only the old key
         $services = config('services');
-        unset($services['apple']);
+        unset($services['apple']['sign_in']);
         $services['sign_in_with_apple'] = [
             'redirect' => 'http://old.dev/callback',
             'client_id' => 'old-client-id',
@@ -53,13 +53,13 @@ class ConfigTest extends UnitTestCase
         restore_error_handler();
 
         $this->assertTrue($deprecationTriggered, 'Deprecation warning should be triggered for old config key');
-        $this->assertEquals('http://old.dev/callback', config('services.apple.redirect'));
+        $this->assertEquals('http://old.dev/callback', config('services.apple.sign_in.redirect'));
     }
 
     public function testDeprecatedConfigKeyDoesNotTriggerWarningWhenNewKeyExists(): void
     {
         // Both keys exist — new key takes precedence, no deprecation
-        config()->set('services.apple', [
+        config()->set('services.apple.sign_in', [
             'redirect' => 'http://new.dev/callback',
             'client_id' => 'new-client-id',
             'client_secret' => 'new-client-secret',
@@ -84,6 +84,6 @@ class ConfigTest extends UnitTestCase
         restore_error_handler();
 
         $this->assertFalse($deprecationTriggered, 'No deprecation when new key exists');
-        $this->assertEquals('http://new.dev/callback', config('services.apple.redirect'));
+        $this->assertEquals('http://new.dev/callback', config('services.apple.sign_in.redirect'));
     }
 }

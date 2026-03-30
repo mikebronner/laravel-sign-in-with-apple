@@ -47,12 +47,12 @@ class ClientSecretGenerator
 
     public static function fromConfig(int $ttlDays = 180): string
     {
-        $teamId = config('services.sign_in_with_apple.team_id', '');
-        $clientId = config('services.sign_in_with_apple.client_id', '');
-        $keyId = config('services.sign_in_with_apple.key_id', '');
+        $teamId = config('services.apple.sign_in.team_id', '');
+        $clientId = config('services.apple.sign_in.client_id', '');
+        $keyId = config('services.apple.sign_in.key_id', '');
 
-        $privateKeyPath = config('services.sign_in_with_apple.private_key_path', '');
-        $privateKey = config('services.sign_in_with_apple.private_key', '');
+        $privateKeyPath = config('services.apple.sign_in.private_key_path', '');
+        $privateKey = config('services.apple.sign_in.private_key', '');
 
         if ($privateKeyPath) {
             if (! file_exists($privateKeyPath)) {

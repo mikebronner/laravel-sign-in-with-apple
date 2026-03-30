@@ -97,7 +97,7 @@ class InvalidCredentialsTest extends UnitTestCase
     public function testDriverResolutionValidatesConfig(): void
     {
         // Clear the config to trigger validation failure
-        config()->set('services.apple', [
+        config()->set('services.apple.sign_in', [
             'client_id' => '',
             'client_secret' => '',
             'redirect' => '',

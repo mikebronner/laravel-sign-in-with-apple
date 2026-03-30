@@ -15,7 +15,7 @@ class ServiceProvider extends LaravelServiceProvider
     public function boot()
     {
         $this->migrateDeprecatedConfig();
-        $this->loadRoutesIf(config('services.apple.routes.enabled', true));
+        $this->loadRoutesIf(config('services.apple.sign_in.routes.enabled', true));
         $this->bootSocialiteDriver();
         $this->bootBladeDirective();
         $this->excludeCallbackFromCsrf();
@@ -53,7 +53,7 @@ class ServiceProvider extends LaravelServiceProvider
      */
     protected function excludeCallbackFromCsrf(): void
     {
-        $redirectUri = config('services.apple.redirect');
+        $redirectUri = config('services.apple.sign_in.redirect');
 
         if (! $redirectUri) {
             return;
@@ -70,7 +70,7 @@ class ServiceProvider extends LaravelServiceProvider
     }
 
     /**
-     * Migrate deprecated `services.sign_in_with_apple` config to `services.apple`.
+     * Migrate deprecated `services.sign_in_with_apple` config to `services.apple.sign_in`.
      *
      * If the old key exists and the new key does not, copy values over and
      * trigger a deprecation notice so users know to update their config.
@@ -79,12 +79,12 @@ class ServiceProvider extends LaravelServiceProvider
     {
         $config = $this->app['config'];
 
-        if ($config->has('services.sign_in_with_apple') && ! $config->has('services.apple')) {
-            $config->set('services.apple', $config->get('services.sign_in_with_apple'));
+        if ($config->has('services.sign_in_with_apple') && ! $config->has('services.apple.sign_in')) {
+            $config->set('services.apple.sign_in', $config->get('services.sign_in_with_apple'));
 
             trigger_error(
                 'The "services.sign_in_with_apple" config key is deprecated. '
-                . 'Please rename it to "services.apple" in your config/services.php. '
+                . 'Please rename it to "services.apple.sign_in" in your config/services.php. '
                 . 'The old key will be removed in the next major version.',
                 E_USER_DEPRECATED,
             );
@@ -98,7 +98,7 @@ class ServiceProvider extends LaravelServiceProvider
         $socialite->extend(
             'sign-in-with-apple',
             function ($app) use ($socialite, $serviceProvider) {
-                $config = $app['config']['services.apple'];
+                $config = $app['config']['services.apple.sign_in'];
 
                 $serviceProvider->validateAppleConfig($config);
 
@@ -151,7 +151,7 @@ class ServiceProvider extends LaravelServiceProvider
             eval("\$params = [$params];");
             list($color, $hasBorder, $type, $borderRadius) = $params;
 
-            $route = config("services.apple.redirect", "#");
+            $route = config("services.apple.sign_in.redirect", "#");
             $backgroundColor = $color === "white"
                 ? "#fff"
                 : "#000";

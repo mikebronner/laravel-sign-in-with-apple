@@ -10,7 +10,7 @@ class ConfigurationTest extends UnitTestCase
     {
         // The updated config only requires client_id, client_secret, and redirect.
         // If we got this far without exceptions, the package bootstrapped correctly.
-        $config = config('services.apple');
+        $config = config('services.apple.sign_in');
 
         $this->assertIsArray($config);
         $this->assertArrayHasKey('client_id', $config);
@@ -25,7 +25,7 @@ class ConfigurationTest extends UnitTestCase
 
         $this->assertArrayNotHasKey(
             'login',
-            $defaultConfig['apple'],
+            $defaultConfig['apple']['sign_in'],
             'The login key should not be in the default config file.'
         );
     }
@@ -33,12 +33,12 @@ class ConfigurationTest extends UnitTestCase
     public function testExistingValidConfigStillWorks(): void
     {
         config([
-            'services.apple.redirect' => 'http://testing.dev/callback',
-            'services.apple.client_id' => 'test-client-id',
-            'services.apple.client_secret' => 'test-client-secret',
+            'services.apple.sign_in.redirect' => 'http://testing.dev/callback',
+            'services.apple.sign_in.client_id' => 'test-client-id',
+            'services.apple.sign_in.client_secret' => 'test-client-secret',
         ]);
 
-        $config = config('services.apple');
+        $config = config('services.apple.sign_in');
 
         $this->assertEquals('http://testing.dev/callback', $config['redirect']);
         $this->assertEquals('test-client-id', $config['client_id']);
@@ -64,10 +64,10 @@ class ConfigurationTest extends UnitTestCase
 
     public function testNoDeprecationWhenNewConfigKeyExists(): void
     {
-        // When `services.apple` is already set, no deprecation should fire
+        // When `services.apple.sign_in` is already set, no deprecation should fire
         // even if the old key also exists.
         config([
-            'services.apple' => [
+            'services.apple.sign_in' => [
                 'client_id' => 'new-id',
                 'client_secret' => 'new-secret',
                 'redirect' => '/new-callback',

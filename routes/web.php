@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'middleware' => ['web'],
 ], function () {
-    $redirectPath = config('services.apple.routes.redirect_route', 'apple/redirect');
-    $callbackPath = config('services.apple.routes.callback_route', 'apple/callback');
+    $redirectPath = config('services.apple.sign_in.routes.redirect_route', 'apple/redirect');
+    $callbackPath = config('services.apple.sign_in.routes.callback_route', 'apple/callback');
 
     Route::get($redirectPath, [AppleSignInController::class, 'redirect'])
         ->name('apple.redirect');
