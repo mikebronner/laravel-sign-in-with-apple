@@ -17,6 +17,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
 - [Implementation](#Implementation)
   - [Button](#Button)
   - [Controller](#Controller)
+- [Testing](#Testing)
 
 <a name="Requirements"></a>
 ## Requirements
@@ -292,6 +293,122 @@ If you receive an error about a missing authorization code in the callback, chec
 2. **CSRF protection must be disabled for the callback** — Since Apple's POST doesn't include a CSRF token, Laravel will return a 419 error and the code will never reach your controller. See the [CSRF Exclusion](#CsrfExclusion) section above.
 
 3. **The redirect URL must exactly match** — The URL in your `.env` (`SIGN_IN_WITH_APPLE_REDIRECT`) must exactly match the Return URL configured in your Apple Developer account, including the protocol, domain, and path.
+
+### Handling Revoked Access
+
+When a user revokes your app's access via Apple ID settings, Apple sends a server-to-server notification. This package provides an `AppleNotificationController` and `AppleAccessRevoked` event to handle this.
+
+**1. Register the notification route:**
+
+```php
+use GeneaLabs\LaravelSignInWithApple\Http\Controllers\AppleNotificationController;
+
+Route::post('/apple/notifications', [AppleNotificationController::class, 'handle'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+```
+
+**2. Listen for the revocation event:**
+
+```php
+// In EventServiceProvider or a listener
+use GeneaLabs\LaravelSignInWithApple\Events\AppleAccessRevoked;
+
+Event::listen(AppleAccessRevoked::class, function (AppleAccessRevoked $event) {
+    // $event->sub — the Apple user ID
+    // $event->eventType — 'consent-revoked' or 'account-delete'
+    
+    $user = User::where('apple_id', $event->sub)->first();
+    if ($user) {
+        // Deactivate, log out, or clean up
+    }
+});
+```
+
+**3. Configure the endpoint in Apple Developer:**
+
+Add your notification URL (`https://example.com/apple/notifications`) in the Apple Developer portal under your Services ID configuration.
+
+**Important:** Apple only provides the user's name and email on the **first** authorization. If a user revokes access and re-authenticates, Apple treats it as a new sign-in but may not provide the name again. Always store the user's name on first sign-in.
+
+**Handling re-authentication after revocation:**
+
+When a user revokes and re-authenticates, Apple may assign a new `sub` value. The Socialite user object includes an `is_returning_user` flag to help you detect this:
+
+```php
+$appleUser = Socialite::driver('sign-in-with-apple')->user();
+
+if ($appleUser['is_returning_user']) {
+    // User re-authenticated after revocation — match by email
+    $user = User::where('email', $appleUser->getEmail())->first();
+} else {
+    // First-time sign-in — name is available
+    $user = User::firstOrCreate(
+        ['apple_id' => $appleUser->getId()],
+        ['name' => $appleUser->getName(), 'email' => $appleUser->getEmail()]
+    );
+}
+```
+
+**Security:** The notification endpoint verifies Apple's JWT signatures against Apple's public keys (fetched from `https://appleid.apple.com/auth/keys`). Keys are cached for 1 hour. Unsigned or forged notifications are rejected.
+
+<a name="Testing"></a>
+## Testing
+
+This package includes unit, feature, and browser tests. Unit and feature tests run without any additional dependencies:
+
+```sh
+vendor/bin/phpunit --testsuite=Unit,Feature
+```
+
+### Browser Tests
+
+Browser tests use [Laravel Dusk](https://laravel.com/docs/dusk) via `orchestra/testbench-dusk` and require a Chrome-based browser installed on your machine.
+
+**Install Chrome or Chromium:**
+
+- **Google Chrome** (recommended):
+  ```sh
+  # macOS
+  brew install --cask google-chrome
+
+  # Ubuntu/Debian
+  sudo apt-get install google-chrome-stable
+  ```
+
+- **Chromium** (lighter alternative):
+  ```sh
+  # macOS
+  brew install --cask chromium
+  ```
+
+  On macOS, Chromium may be blocked by Gatekeeper. Remove the quarantine flag after installing:
+  ```sh
+  xattr -dr com.apple.quarantine /Applications/Chromium.app
+  ```
+
+**Install Chromedriver:**
+
+The package uses `orchestra/dusk-updater` (included as a dev dependency) to manage the Chromedriver binary. Run this to auto-detect your Chrome version and install the matching Chromedriver:
+
+```sh
+# If Google Chrome is installed (auto-detected):
+vendor/bin/dusk-updater detect --auto-update --no-interaction
+
+# If using Chromium on macOS (must specify the binary path):
+vendor/bin/dusk-updater detect --chrome-dir="/Applications/Chromium.app/Contents/MacOS/Chromium" --auto-update --no-interaction
+```
+
+**Run browser tests:**
+
+```sh
+vendor/bin/phpunit --testsuite=Browser
+```
+
+**Run all tests:**
+
+```sh
+vendor/bin/phpunit
+```
 
 <a name="MigrationGuide"></a>
 ## Migration Guide
