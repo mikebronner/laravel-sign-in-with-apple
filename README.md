@@ -17,6 +17,7 @@ We thank the following sponsors for their generosity, please take a moment to ch
 - [Implementation](#Implementation)
   - [Button](#Button)
   - [Controller](#Controller)
+- [Testing](#Testing)
 
 <a name="Requirements"></a>
 ## Requirements
@@ -313,6 +314,65 @@ if ($appleUser['is_returning_user']) {
 ```
 
 **Security:** The notification endpoint verifies Apple's JWT signatures against Apple's public keys (fetched from `https://appleid.apple.com/auth/keys`). Keys are cached for 1 hour. Unsigned or forged notifications are rejected.
+
+<a name="Testing"></a>
+## Testing
+
+This package includes unit, feature, and browser tests. Unit and feature tests run without any additional dependencies:
+
+```sh
+vendor/bin/phpunit --testsuite=Unit,Feature
+```
+
+### Browser Tests
+
+Browser tests use [Laravel Dusk](https://laravel.com/docs/dusk) via `orchestra/testbench-dusk` and require a Chrome-based browser installed on your machine.
+
+**Install Chrome or Chromium:**
+
+- **Google Chrome** (recommended):
+  ```sh
+  # macOS
+  brew install --cask google-chrome
+
+  # Ubuntu/Debian
+  sudo apt-get install google-chrome-stable
+  ```
+
+- **Chromium** (lighter alternative):
+  ```sh
+  # macOS
+  brew install --cask chromium
+  ```
+
+  On macOS, Chromium may be blocked by Gatekeeper. Remove the quarantine flag after installing:
+  ```sh
+  xattr -dr com.apple.quarantine /Applications/Chromium.app
+  ```
+
+**Install Chromedriver:**
+
+The package uses `orchestra/dusk-updater` (included as a dev dependency) to manage the Chromedriver binary. Run this to auto-detect your Chrome version and install the matching Chromedriver:
+
+```sh
+# If Google Chrome is installed (auto-detected):
+vendor/bin/dusk-updater detect --auto-update --no-interaction
+
+# If using Chromium on macOS (must specify the binary path):
+vendor/bin/dusk-updater detect --chrome-dir="/Applications/Chromium.app/Contents/MacOS/Chromium" --auto-update --no-interaction
+```
+
+**Run browser tests:**
+
+```sh
+vendor/bin/phpunit --testsuite=Browser
+```
+
+**Run all tests:**
+
+```sh
+vendor/bin/phpunit
+```
 
 <a name="MigrationGuide"></a>
 ## Migration Guide
