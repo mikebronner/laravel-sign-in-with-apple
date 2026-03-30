@@ -14,8 +14,8 @@ class ClientSecretGeneratorTest extends UnitTestCase
     protected function generateTestKey(): string
     {
         $key = openssl_pkey_new([
-            'curve_name' => 'prime256v1',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
+            'ec' => ['curve_name' => 'prime256v1'],
         ]);
 
         openssl_pkey_export($key, $pem);
@@ -150,5 +150,67 @@ class ClientSecretGeneratorTest extends UnitTestCase
             privateKey: 'fake-key',
             ttlDays: 0,
         );
+    }
+
+    public function testFromConfigReadsConfigValues(): void
+    {
+        $privateKey = $this->generateTestKey();
+
+        config([
+            'services.sign_in_with_apple.team_id' => 'CONFIG_TEAM',
+            'services.sign_in_with_apple.client_id' => 'com.config.service',
+            'services.sign_in_with_apple.key_id' => 'CONFIG_KEY',
+            'services.sign_in_with_apple.private_key' => $privateKey,
+            'services.sign_in_with_apple.private_key_path' => '',
+        ]);
+
+        $jwt = ClientSecretGenerator::fromConfig(ttlDays: 30);
+
+        $parts = explode('.', $jwt);
+        $payload = json_decode(base64_decode($parts[1]), true);
+
+        $this->assertEquals('CONFIG_TEAM', $payload['iss']);
+        $this->assertEquals('com.config.service', $payload['sub']);
+    }
+
+    public function testFromConfigPrefersKeyPathOverKeyContent(): void
+    {
+        $privateKey = $this->generateTestKey();
+        $tempFile = tempnam(sys_get_temp_dir(), 'apple_key_');
+        file_put_contents($tempFile, $privateKey);
+
+        config([
+            'services.sign_in_with_apple.team_id' => 'TEAM_PATH',
+            'services.sign_in_with_apple.client_id' => 'com.path.service',
+            'services.sign_in_with_apple.key_id' => 'KEY_PATH',
+            'services.sign_in_with_apple.private_key' => 'this-would-fail-if-used',
+            'services.sign_in_with_apple.private_key_path' => $tempFile,
+        ]);
+
+        $jwt = ClientSecretGenerator::fromConfig();
+
+        $parts = explode('.', $jwt);
+        $this->assertCount(3, $parts);
+
+        $payload = json_decode(base64_decode($parts[1]), true);
+        $this->assertEquals('TEAM_PATH', $payload['iss']);
+
+        unlink($tempFile);
+    }
+
+    public function testFromConfigThrowsWhenKeyPathSetButFileMissing(): void
+    {
+        config([
+            'services.sign_in_with_apple.team_id' => 'TEAM123',
+            'services.sign_in_with_apple.client_id' => 'com.example.service',
+            'services.sign_in_with_apple.key_id' => 'KEY456',
+            'services.sign_in_with_apple.private_key' => 'fallback-key',
+            'services.sign_in_with_apple.private_key_path' => '/nonexistent/path/key.p8',
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('not found');
+
+        ClientSecretGenerator::fromConfig();
     }
 }
