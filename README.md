@@ -133,6 +133,42 @@ We thank the following sponsors for their generosity, please take a moment to ch
         ruby client_secret.rb
         ```
 
+
+#### Alternative: Generate client_secret in PHP
+
+Instead of using the Ruby script above, you can generate the client secret JWT directly in PHP using this package's built-in helper:
+
+```php
+use GeneaLabs\LaravelSignInWithApple\Support\ClientSecretGenerator;
+
+// One-off generation
+$secret = ClientSecretGenerator::generate(
+    teamId: 'YOUR_TEAM_ID',
+    clientId: 'com.example.service',
+    keyId: 'YOUR_KEY_ID',
+    privateKey: file_get_contents(storage_path('keys/apple-auth-key.p8')),
+    ttlDays: 180, // Max 180 days
+);
+
+// Or use config/env values automatically
+$secret = ClientSecretGenerator::fromConfig();
+```
+
+You can use an Artisan command or scheduled task to auto-rotate the secret before it expires:
+
+```php
+// In a scheduled command or service provider
+$secret = ClientSecretGenerator::fromConfig(ttlDays: 180);
+config(['services.sign_in_with_apple.client_secret' => $secret]);
+```
+
+Required env vars for `fromConfig()`:
+```env
+SIGN_IN_WITH_APPLE_TEAM_ID=your-team-id
+SIGN_IN_WITH_APPLE_KEY_ID=your-key-id
+SIGN_IN_WITH_APPLE_PRIVATE_KEY_PATH=/path/to/key.p8
+```
+
 5. Set the necessary environment variables in your `.env` file:
 
     ```env
