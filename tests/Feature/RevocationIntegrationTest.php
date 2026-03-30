@@ -199,4 +199,46 @@ class RevocationIntegrationTest extends UnitTestCase
         $this->assertEquals('John Doe', $user->getName());
         $this->assertFalse($user['is_returning_user']);
     }
+
+    public function testApplePublicKeysAreCached(): void
+    {
+        // Build JWKS from the same key pair generated in setUp()
+        $resource = openssl_pkey_get_private($this->privateKey);
+        $details = openssl_pkey_get_details($resource);
+
+        $n = rtrim(strtr(base64_encode($details['rsa']['n']), '+/', '-_'), '=');
+        $e = rtrim(strtr(base64_encode($details['rsa']['e']), '+/', '-_'), '=');
+
+        $jwks = [
+            'keys' => [[
+                'kty' => 'RSA',
+                'kid' => $this->keyId,
+                'use' => 'sig',
+                'alg' => 'RS256',
+                'n' => $n,
+                'e' => $e,
+            ]],
+        ];
+
+        // Re-fake HTTP so the first call returns the JWKS and the second would fail
+        Http::fake([
+            'appleid.apple.com/auth/keys*' => Http::sequence()
+                ->push($jwks, 200)
+                ->push([], 500),
+        ]);
+
+        Cache::forget('apple-auth-keys');
+
+        $jwt = $this->makeSignedJwt([
+            'events' => ['type' => 'consent-revoked', 'sub' => 'user-1'],
+        ]);
+
+        // First call — fetches keys and caches them
+        $response1 = $this->postJson('/apple/notifications', ['payload' => $jwt]);
+        $response1->assertOk();
+
+        // Second call — uses cached keys (HTTP would return 500 if not cached)
+        $response2 = $this->postJson('/apple/notifications', ['payload' => $jwt]);
+        $response2->assertOk();
+    }
 }

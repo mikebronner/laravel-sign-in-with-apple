@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GeneaLabs\LaravelSignInWithApple\Http\Controllers;
 
+use DomainException;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use GeneaLabs\LaravelSignInWithApple\Events\AppleAccessRevoked;
@@ -10,23 +13,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use InvalidArgumentException;
 use UnexpectedValueException;
 
-/**
- * Handles Apple's server-to-server notifications.
- *
- * Apple sends notifications when users revoke access, transfer accounts,
- * or when email relay changes occur.
- *
- * Register this route in your app:
- *
- *     Route::post('/apple/notifications', [AppleNotificationController::class, 'handle']);
- */
 class AppleNotificationController extends Controller
 {
-    /**
-     * Handle an incoming Apple server-to-server notification.
-     */
     public function handle(Request $request): JsonResponse
     {
         $payload = $request->input('payload');
@@ -55,12 +46,6 @@ class AppleNotificationController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    /**
-     * Decode and verify the JWT payload from Apple.
-     *
-     * Verifies the JWT signature against Apple's public keys fetched from
-     * https://appleid.apple.com/auth/keys. Keys are cached for 1 hour.
-     */
     protected function decodePayload(string $jwt): ?array
     {
         try {
@@ -68,14 +53,11 @@ class AppleNotificationController extends Controller
             $decoded = JWT::decode($jwt, JWK::parseKeySet($keys));
 
             return (array) json_decode(json_encode($decoded), true);
-        } catch (UnexpectedValueException) {
+        } catch (UnexpectedValueException | DomainException | InvalidArgumentException) {
             return null;
         }
     }
 
-    /**
-     * Fetch Apple's public keys for JWT verification, cached for 1 hour.
-     */
     protected function getApplePublicKeys(): array
     {
         return Cache::remember('apple-auth-keys', 3600, function () {
